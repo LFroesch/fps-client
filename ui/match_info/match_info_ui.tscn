@@ -131,3 +131,28 @@ theme_override_font_sizes/font_size = 34
 text = "12"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="RightContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 0
+
+[node name="EliminationTextsContainer" type="VBoxContainer" parent="MarginContainer/RightContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 0
+
+[node name="ChatInputContainer" type="MarginContainer" parent="MarginContainer/RightContainer" groups=["ChatInputContainer"]]
+visible = false
+layout_mode = 2
+theme_override_constants/margin_top = 8
+
+[node name="ChatInput" type="LineEdit" parent="MarginContainer/RightContainer/ChatInputContainer" groups=["ChatInput"]]
+custom_minimum_size = Vector2(300, 0)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_placeholder_color = Color(0.7, 0.7, 0.7, 1)
+theme_override_font_sizes/font_size = 14
+placeholder_text = "Press Enter to send..."
+max_length = 120
+caret_blink = true

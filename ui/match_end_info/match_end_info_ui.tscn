@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://dk57er5fqigsn"]
 
-[ext_resource type="Texture2D" uid="uid://byukgpq4ekqs4" path="res://assets/textures/bg_black_and_white.png" id="1_algbl"]
+[ext_resource type="Texture2D" uid="uid://byukgpq4ekqs4" path="res://asset_packs/tutorial-fps-assets/textures/bg_black_and_white.png" id="1_algbl"]
 [ext_resource type="Script" uid="uid://cf3s27rmyls86" path="res://ui/match_end_info/match_end_info_ui.gd" id="1_scw5f"]
-[ext_resource type="Texture2D" uid="uid://c11uhyootlqhk" path="res://assets/textures/kills_icon.png" id="2_p5bbx"]
-[ext_resource type="Texture2D" uid="uid://dkc2w6xm210fc" path="res://assets/textures/deaths_icon.png" id="3_scw5f"]
+[ext_resource type="Texture2D" uid="uid://c11uhyootlqhk" path="res://asset_packs/tutorial-fps-assets/textures/kills_icon.png" id="2_p5bbx"]
+[ext_resource type="Texture2D" uid="uid://dkc2w6xm210fc" path="res://asset_packs/tutorial-fps-assets/textures/deaths_icon.png" id="3_scw5f"]
 
 [node name="MatchEndInfoUI" type="Control"]
 layout_mode = 3

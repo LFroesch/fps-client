@@ -19,3 +19,22 @@ func set_data(_player_name : String, _kills_amount : int, _deaths_amount : int) 
 	player_name = _player_name
 	kills_amount = _kills_amount
 	deaths_amount = _deaths_amount
+
+	# Update labels immediately if they exist
+	if player_name_label:
+		player_name_label.text = player_name
+	if kills_amount_label:
+		kills_amount_label.text = str(kills_amount)
+	if deaths_amount_label:
+		deaths_amount_label.text = str(deaths_amount)
+
+func set_zombie_data(_player_name : String, _points : int, _kills : int) -> void:
+	player_name = _player_name
+
+	# For zombie mode: kills column shows points, deaths column shows kills
+	if player_name_label:
+		player_name_label.text = player_name
+	if kills_amount_label:
+		kills_amount_label.text = str(_points)
+	if deaths_amount_label:
+		deaths_amount_label.text = str(_kills)

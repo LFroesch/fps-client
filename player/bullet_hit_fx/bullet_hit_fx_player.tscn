@@ -10,7 +10,6 @@ initial_velocity_max = 4.0
 gravity = Vector3(0, -5, 0)
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_mmgcd"]
-load_path = "res://.godot/imported/circle_32.png-1f93c02320731d0bd583452090f46824.s3tc.ctex"
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_74ex6"]
 transparency = 1

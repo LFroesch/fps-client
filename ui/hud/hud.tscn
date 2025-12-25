@@ -1,8 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://qty0uvl51pci"]
+[gd_scene load_steps=12 format=3 uid="uid://qty0uvl51pci"]
 
+[ext_resource type="Script" uid="uid://c1ynegn11ouxg" path="res://ui/hud/hud_manager.gd" id="1_hudmgr"]
+[ext_resource type="Texture2D" uid="uid://bxl7ephwmm31e" path="res://asset_packs/tutorial-fps-assets/textures/health_change_mask.png" id="1_imuuq"]
 [ext_resource type="PackedScene" uid="uid://djupja6ectlps" path="res://player/player_info/health_bar.tscn" id="1_xmswo"]
-[ext_resource type="Texture2D" uid="uid://cr3t77cm3qiui" path="res://assets/textures/grenade_icon.png" id="2_4d6w6"]
+[ext_resource type="Texture2D" uid="uid://cr3t77cm3qiui" path="res://asset_packs/tutorial-fps-assets/textures/grenade_icon.png" id="2_4d6w6"]
+[ext_resource type="Script" uid="uid://bei7oe8k7yf84" path="res://ui/hud/health_change_mask.gd" id="2_kwc50"]
 [ext_resource type="Script" uid="uid://ccxgx5b5w0ek8" path="res://ui/hud/grenade_prompt_control.gd" id="3_e0nub"]
+[ext_resource type="PackedScene" uid="uid://dhhpdmdt7lcqs" path="res://ui/hud/hit_marker.tscn" id="4_hitmarker"]
+[ext_resource type="PackedScene" uid="uid://cubeh7citnpfw" path="res://ui/hud/kill_confirmation.tscn" id="6_killconf"]
+[ext_resource type="PackedScene" path="res://ui/hud/downed_overlay.tscn" id="9_downed"]
+[ext_resource type="PackedScene" path="res://ui/hud/revive_progress.tscn" id="10_revive"]
+[ext_resource type="PackedScene" uid="uid://interaction_prompt_001" path="res://ui/hud/interaction_prompt.tscn" id="11_interact"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0nub"]
 resource_local_to_scene = true
@@ -13,7 +21,7 @@ corner_radius_top_right = 8
 corner_radius_bottom_right = 8
 corner_radius_bottom_left = 8
 
-[node name="HUD" type="Control"]
+[node name="HUD" type="Control" groups=["HUDManager"]]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -21,6 +29,19 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+script = ExtResource("1_hudmgr")
+
+[node name="HealthChangeMask" type="TextureRect" parent="." groups=["HealthChangeMask"]]
+modulate = Color(1, 0, 0, 0)
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("1_imuuq")
+expand_mode = 1
+script = ExtResource("2_kwc50")
 
 [node name="Crosshair" type="ColorRect" parent="."]
 custom_minimum_size = Vector2(4, 4)
@@ -79,3 +100,53 @@ stretch_mode = 5
 [node name="GrenadePromptControl" type="Control" parent="MarginContainer" groups=["GrenadePromptsControl"]]
 layout_mode = 2
 script = ExtResource("3_e0nub")
+
+[node name="HitMarker" parent="." instance=ExtResource("4_hitmarker")]
+layout_mode = 1
+
+[node name="DamageNumbersContainer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="KillConfirmation" parent="." instance=ExtResource("6_killconf")]
+layout_mode = 1
+
+[node name="AmmoContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+offset_left = 760.0
+offset_top = 390.0
+offset_right = 933.0
+offset_bottom = 459.0
+size_flags_horizontal = 8
+size_flags_vertical = 8
+
+[node name="ReloadPrompt" type="Label" parent="AmmoContainer" groups=["ReloadPrompt"]]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 18
+text = "PRESS R TO RELOAD"
+horizontal_alignment = 2
+
+[node name="AmmoLabel" type="Label" parent="AmmoContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 2
+theme_override_font_sizes/font_size = 28
+text = "12 / 60"
+horizontal_alignment = 2
+
+[node name="DownedOverlay" parent="." instance=ExtResource("9_downed")]
+layout_mode = 1
+
+[node name="ReviveProgress" parent="." instance=ExtResource("10_revive")]
+layout_mode = 1
+
+[node name="InteractionPrompt" parent="." instance=ExtResource("11_interact")]
+layout_mode = 1

@@ -1,11 +1,9 @@
 [gd_scene load_steps=3 format=3 uid="uid://bv8t4lj4s0qeo"]
 
 [ext_resource type="PackedScene" uid="uid://ccu2wfr7jqq8p" path="res://player/weapons/weapon.tscn" id="1_nmaf5"]
-[ext_resource type="PackedScene" uid="uid://bkjegh3ybtbvk" path="res://assets/meshes/items/smg_mesh.tscn" id="2_qkfq6"]
+[ext_resource type="PackedScene" uid="uid://bkjegh3ybtbvk" path="res://asset_packs/tutorial-fps-assets/meshes/items/smg_mesh.tscn" id="2_qkfq6"]
 
 [node name="WeaponSMG" instance=ExtResource("1_nmaf5")]
-is_automatic = true
-shot_cooldown = 0.1
 
 [node name="Muzzle" parent="." index="0"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.259849, -1.01484)

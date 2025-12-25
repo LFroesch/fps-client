@@ -19,15 +19,15 @@ const ANIM_BLEND_TIME := 0.2
 var display_name : String
 @export var name_tag_label: Label
 
-const BLUE_MATERIAL : StandardMaterial3D = preload("res://assets/materials/blue_team_material.tres")
-const RED_MATERIAL : StandardMaterial3D = preload("res://assets/materials/red_team_material.tres")
+const BLUE_MATERIAL : StandardMaterial3D = preload("res://asset_packs/tutorial-fps-assets/materials/blue_team_material.tres")
+const RED_MATERIAL : StandardMaterial3D = preload("res://asset_packs/tutorial-fps-assets/materials/red_team_material.tres")
 @onready var helmet_mesh: MeshInstance3D = %Head_2
 @onready var body_mesh: MeshInstance3D = %Body
 
 const SKIN_MATERIALS := [
-	preload("res://assets/materials/player_skin1.tres"),
-	preload("res://assets/materials/player_skin2.tres"),
-	preload("res://assets/materials/player_skin3.tres")
+	preload("res://asset_packs/tutorial-fps-assets/materials/player_skin1.tres"),
+	preload("res://asset_packs/tutorial-fps-assets/materials/player_skin2.tres"),
+	preload("res://asset_packs/tutorial-fps-assets/materials/player_skin3.tres")
 ]
 
 func _ready() -> void:
@@ -42,6 +42,9 @@ func update_body_geometry(old_data : Dictionary, new_data : Dictionary, lerp_wei
 	set_rot_x_visuals(lerp_angle(old_data.rot_x, new_data.rot_x, lerp_weight))
 	
 func set_anim(anim_name : String) -> void:
+	if animation_player.assigned_animation == "Jump_Idle" and anim_name != "Jump_Idle":
+		AudioManager.play_sfx(AudioManager.SFXKeys.JumpLand, global_position, 0.2)
+		
 	if animation_player.assigned_animation == anim_name:
 		return
 	animation_player.play(anim_name, ANIM_BLEND_TIME)
@@ -78,3 +81,6 @@ func update_name_tag() -> void:
 
 func play_shoot_fx() -> void:
 	weapon_holder.weapon.play_shoot_fx()
+
+func play_footstep_sfx() -> void:
+	AudioManager.play_sfx(AudioManager.SFXKeys.Footstep, global_position, 0.2)

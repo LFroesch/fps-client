@@ -1,10 +1,10 @@
 [gd_scene load_steps=10 format=3 uid="uid://b701rjdsnk1r1"]
 
 [ext_resource type="Script" uid="uid://63eqsqber3i" path="res://ui/weapon_selection/weapon_selection_ui.gd" id="1_an783"]
-[ext_resource type="Texture2D" uid="uid://byukgpq4ekqs4" path="res://assets/textures/bg_black_and_white.png" id="2_arxr7"]
-[ext_resource type="Texture2D" uid="uid://s58vmrup64sq" path="res://assets/textures/icon_pistol.png" id="3_cc676"]
-[ext_resource type="Texture2D" uid="uid://g8m2gqpblh63" path="res://assets/textures/icon_smg.png" id="4_5grgf"]
-[ext_resource type="Texture2D" uid="uid://dardw6x0uvg7j" path="res://assets/textures/icon_shotgun.png" id="5_ir1k2"]
+[ext_resource type="Texture2D" uid="uid://byukgpq4ekqs4" path="res://asset_packs/tutorial-fps-assets/textures/bg_black_and_white.png" id="2_arxr7"]
+[ext_resource type="Texture2D" uid="uid://s58vmrup64sq" path="res://asset_packs/tutorial-fps-assets/textures/icon_pistol.png" id="3_cc676"]
+[ext_resource type="Texture2D" uid="uid://g8m2gqpblh63" path="res://asset_packs/tutorial-fps-assets/textures/icon_smg.png" id="4_5grgf"]
+[ext_resource type="Texture2D" uid="uid://dardw6x0uvg7j" path="res://asset_packs/tutorial-fps-assets/textures/icon_shotgun.png" id="5_ir1k2"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_75a6j"]
 bg_color = Color(0.392157, 0.392157, 0.392157, 0.745098)
@@ -44,6 +44,7 @@ grow_vertical = 2
 script = ExtResource("1_an783")
 
 [node name="BackgroundTexture" type="TextureRect" parent="."]
+unique_name_in_owner = true
 modulate = Color(0.478431, 0.478431, 0.478431, 1)
 layout_mode = 1
 anchors_preset = 15
@@ -55,24 +56,31 @@ texture = ExtResource("2_arxr7")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="HBoxContainer" type="HBoxContainer" parent="."]
+[node name="GridContainer" type="GridContainer" parent="."]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 64
-alignment = 1
+theme_override_constants/h_separation = 32
+theme_override_constants/v_separation = 32
+columns = 3
 
-[node name="PistolPanel" type="Panel" parent="HBoxContainer"]
+[node name="PistolPanel" type="Panel" parent="GridContainer"]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_75a6j")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/PistolPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/PistolPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -81,20 +89,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="TextureRect" type="TextureRect" parent="HBoxContainer/PistolPanel/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/PistolPanel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("3_cc676")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="HBoxContainer/PistolPanel/VBoxContainer"]
+[node name="Label" type="Label" parent="GridContainer/PistolPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Pistol"
 horizontal_alignment = 1
 
-[node name="PistolButton" type="Button" parent="HBoxContainer/PistolPanel"]
+[node name="PistolButton" type="Button" parent="GridContainer/PistolPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -105,14 +113,14 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_xw0ot")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_00o7p")
 theme_override_styles/normal = SubResource("StyleBoxFlat_peoiv")
 
-[node name="SMGPanel" type="Panel" parent="HBoxContainer"]
+[node name="SMGPanel" type="Panel" parent="GridContainer"]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_75a6j")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/SMGPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/SMGPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -121,20 +129,20 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="TextureRect" type="TextureRect" parent="HBoxContainer/SMGPanel/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/SMGPanel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("4_5grgf")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="HBoxContainer/SMGPanel/VBoxContainer"]
+[node name="Label" type="Label" parent="GridContainer/SMGPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "SMG"
 horizontal_alignment = 1
 
-[node name="SMGButton" type="Button" parent="HBoxContainer/SMGPanel"]
+[node name="SMGButton" type="Button" parent="GridContainer/SMGPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -145,14 +153,14 @@ theme_override_styles/hover = SubResource("StyleBoxFlat_xw0ot")
 theme_override_styles/pressed = SubResource("StyleBoxFlat_00o7p")
 theme_override_styles/normal = SubResource("StyleBoxFlat_peoiv")
 
-[node name="ShotgunPanel" type="Panel" parent="HBoxContainer"]
+[node name="ShotgunPanel" type="Panel" parent="GridContainer"]
 custom_minimum_size = Vector2(128, 128)
 layout_mode = 2
 size_flags_horizontal = 4
 size_flags_vertical = 4
 theme_override_styles/panel = SubResource("StyleBoxFlat_75a6j")
 
-[node name="VBoxContainer" type="VBoxContainer" parent="HBoxContainer/ShotgunPanel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/ShotgunPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -161,20 +169,140 @@ grow_horizontal = 2
 grow_vertical = 2
 theme_override_constants/separation = 0
 
-[node name="TextureRect" type="TextureRect" parent="HBoxContainer/ShotgunPanel/VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="GridContainer/ShotgunPanel/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 texture = ExtResource("5_ir1k2")
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="HBoxContainer/ShotgunPanel/VBoxContainer"]
+[node name="Label" type="Label" parent="GridContainer/ShotgunPanel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 40)
 layout_mode = 2
 text = "Shotgun"
 horizontal_alignment = 1
 
-[node name="ShotgunButton" type="Button" parent="HBoxContainer/ShotgunPanel"]
+[node name="ShotgunButton" type="Button" parent="GridContainer/ShotgunPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/hover = SubResource("StyleBoxFlat_xw0ot")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_00o7p")
+theme_override_styles/normal = SubResource("StyleBoxFlat_peoiv")
+
+[node name="SniperPanel" type="Panel" parent="GridContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_75a6j")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/SniperPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/SniperPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("3_cc676")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="GridContainer/SniperPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Sniper"
+horizontal_alignment = 1
+
+[node name="SniperButton" type="Button" parent="GridContainer/SniperPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/hover = SubResource("StyleBoxFlat_xw0ot")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_00o7p")
+theme_override_styles/normal = SubResource("StyleBoxFlat_peoiv")
+
+[node name="AssaultRiflePanel" type="Panel" parent="GridContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_75a6j")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/AssaultRiflePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/AssaultRiflePanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("3_cc676")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="GridContainer/AssaultRiflePanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "Assault Rifle"
+horizontal_alignment = 1
+
+[node name="AssaultRifleButton" type="Button" parent="GridContainer/AssaultRiflePanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/hover = SubResource("StyleBoxFlat_xw0ot")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_00o7p")
+theme_override_styles/normal = SubResource("StyleBoxFlat_peoiv")
+
+[node name="LMGPanel" type="Panel" parent="GridContainer"]
+custom_minimum_size = Vector2(128, 128)
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+theme_override_styles/panel = SubResource("StyleBoxFlat_75a6j")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="GridContainer/LMGPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TextureRect" type="TextureRect" parent="GridContainer/LMGPanel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+texture = ExtResource("3_cc676")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="Label" type="Label" parent="GridContainer/LMGPanel/VBoxContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+text = "LMG"
+horizontal_alignment = 1
+
+[node name="LMGButton" type="Button" parent="GridContainer/LMGPanel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -189,7 +317,10 @@ theme_override_styles/normal = SubResource("StyleBoxFlat_peoiv")
 wait_time = 5.0
 one_shot = true
 
-[connection signal="pressed" from="HBoxContainer/PistolPanel/PistolButton" to="." method="_on_pistol_button_pressed"]
-[connection signal="pressed" from="HBoxContainer/SMGPanel/SMGButton" to="." method="_on_smg_button_pressed"]
-[connection signal="pressed" from="HBoxContainer/ShotgunPanel/ShotgunButton" to="." method="_on_shotgun_button_pressed"]
+[connection signal="pressed" from="GridContainer/PistolPanel/PistolButton" to="." method="_on_pistol_button_pressed"]
+[connection signal="pressed" from="GridContainer/SMGPanel/SMGButton" to="." method="_on_smg_button_pressed"]
+[connection signal="pressed" from="GridContainer/ShotgunPanel/ShotgunButton" to="." method="_on_shotgun_button_pressed"]
+[connection signal="pressed" from="GridContainer/SniperPanel/SniperButton" to="." method="_on_sniper_button_pressed"]
+[connection signal="pressed" from="GridContainer/AssaultRiflePanel/AssaultRifleButton" to="." method="_on_assault_rifle_button_pressed"]
+[connection signal="pressed" from="GridContainer/LMGPanel/LMGButton" to="." method="_on_lmg_button_pressed"]
 [connection signal="timeout" from="AutoSelectTimer" to="." method="_on_auto_select_timer_timeout"]

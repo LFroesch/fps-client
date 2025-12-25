@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://di1vjjm2mmmyk"]
 
-[ext_resource type="Texture2D" uid="uid://cr3t77cm3qiui" path="res://assets/textures/grenade_icon.png" id="1_im7eo"]
+[ext_resource type="Texture2D" uid="uid://cr3t77cm3qiui" path="res://asset_packs/tutorial-fps-assets/textures/grenade_icon.png" id="1_im7eo"]
 [ext_resource type="Script" uid="uid://bps2qfjbtfdv0" path="res://ui/hud/grenade_prompt.gd" id="1_mekxm"]
 
 [node name="GrenadePrompt" type="Control"]

@@ -4,8 +4,13 @@ signal on_lobby_clients_updated(connected_clients : int, max_clients : int)
 signal on_cant_connect_to_lobby
 signal on_lobby_locked
 
-const PORT := 7777
-const ADDRESS := "127.0.0.1"
+#Local
+#const PORT := 7777
+#const ADDRESS := "127.0.0.1"
+
+#playit.gg
+const ADDRESS := "147.185.221.16"
+const PORT := 6357
 
 @onready var clock_sync_timer: Timer = $ClockSyncTimer
 
@@ -21,9 +26,10 @@ func _ready() -> void:
 		return
 	
 	multiplayer.multiplayer_peer = peer
-	
+
 	multiplayer.connected_to_server.connect(_on_connected_to_server)
 	multiplayer.connection_failed.connect(_on_connection_failed)
+	multiplayer.server_disconnected.connect(_on_server_disconnected)
 	
 func _on_connected_to_server() -> void:
 	clock_sync_timer.start()
@@ -31,12 +37,29 @@ func _on_connected_to_server() -> void:
 
 func _on_connection_failed() -> void:
 	print("failed to connect to server")
+	_cleanup_connection()
 
-func try_connect_client_to_lobby(player_name : String) -> void:
-	c_try_connect_client_to_lobby.rpc_id(1, player_name)
+func _on_server_disconnected() -> void:
+	print("server disconnected")
+	_cleanup_connection()
+
+func _cleanup_connection() -> void:
+	# Stop the clock sync timer to prevent RPC errors
+	if clock_sync_timer and clock_sync_timer.is_inside_tree():
+		clock_sync_timer.stop()
+
+	# Clean up any active lobbies
+	for child in get_children():
+		if child is Lobby:
+			child.queue_free()
+
+func try_connect_client_to_lobby(player_name : String, map_id : int, game_mode : int = MapRegistry.GameMode.PVP) -> void:
+	if peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+	c_try_connect_client_to_lobby.rpc_id(1, player_name, map_id, game_mode)
 
 @rpc("any_peer", "call_remote", "reliable")
-func c_try_connect_client_to_lobby(player_name : String) -> void:
+func c_try_connect_client_to_lobby(player_name : String, map_id : int, game_mode : int = MapRegistry.GameMode.PVP) -> void:
 	pass
 
 @rpc("authority", "call_remote", "reliable")
@@ -48,6 +71,8 @@ func s_client_cant_connect_to_lobby() -> void:
 	on_cant_connect_to_lobby.emit()
 
 func cancel_quickplay_search() -> void:
+	if peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
 	c_cancel_quickplay_search.rpc_id(1)
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -62,6 +87,9 @@ func s_create_lobby_on_clients(lobby_name: String) -> void:
 	on_lobby_locked.emit()
 
 func _on_clock_sync_timer_timeout() -> void:
+	# Check if peer is connected before attempting RPC
+	if peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
 	c_get_server_clock_time.rpc_id(1, floori(Time.get_unix_time_from_system() * 1000))
 
 @rpc("any_peer", "call_remote", "unreliable_ordered")

@@ -1,7 +1,7 @@
 [gd_scene load_steps=20 format=3 uid="uid://x5labs1dsviw"]
 
 [ext_resource type="Script" uid="uid://ds1q7co2ypwq5" path="res://player/grenade/grenade_explosion_fx.gd" id="1_7h5my"]
-[ext_resource type="Texture2D" uid="uid://c8cdsrc8ot1p8" path="res://assets/textures/circle_32.png" id="2_gw02c"]
+[ext_resource type="Texture2D" uid="uid://c8cdsrc8ot1p8" path="res://asset_packs/tutorial-fps-assets/textures/circle_32.png" id="2_gw02c"]
 
 [sub_resource type="Gradient" id="Gradient_k0fcb"]
 offsets = PackedFloat32Array(0, 0.5, 1)
@@ -60,7 +60,7 @@ initial_velocity_max = 8.0
 _data = [Vector2(0, 0.00723469), 0.0, 4.61282, 0, 0, Vector2(0.5, 1), -0.150034, -0.150034, 0, 0, Vector2(1, 0), -4.81892, 0.0, 0, 0]
 point_count = 3
 
-[sub_resource type="CurveTexture" id="CurveTexture_mg5xy"]
+[sub_resource type="CurveTexture" id="CurveTexture_7h5my"]
 curve = SubResource("Curve_l2yc2")
 
 [sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_ydw76"]
@@ -71,12 +71,11 @@ spread = 10.0
 initial_velocity_min = 0.2
 initial_velocity_max = 1.0
 gravity = Vector3(0, 0, 0)
-alpha_curve = SubResource("CurveTexture_mg5xy")
+alpha_curve = SubResource("CurveTexture_7h5my")
 
 [sub_resource type="CompressedTexture2D" id="CompressedTexture2D_fm2b7"]
-load_path = "res://.godot/imported/circle_32.png-1f93c02320731d0bd583452090f46824.s3tc.ctex"
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d7ayt"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gw02c"]
 transparency = 1
 vertex_color_use_as_albedo = true
 albedo_color = Color(0.207843, 0.207843, 0.207843, 1)
@@ -87,7 +86,7 @@ particles_anim_v_frames = 1
 particles_anim_loop = false
 
 [sub_resource type="QuadMesh" id="QuadMesh_esdqj"]
-material = SubResource("StandardMaterial3D_d7ayt")
+material = SubResource("StandardMaterial3D_gw02c")
 size = Vector2(0.1, 0.1)
 
 [node name="GrenadeExplosionFX" type="Node3D"]

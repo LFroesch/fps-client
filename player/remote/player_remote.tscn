@@ -3653,6 +3653,7 @@ tracks/34/keys = PackedFloat32Array(0, 1, -3.55273e-15, -5.96046e-07, 3.38813e-2
 resource_name = "Run_Shoot"
 length = 0.733333
 loop_mode = 1
+step = 0.01
 tracks/0/type = "position_3d"
 tracks/0/imported = true
 tracks/0/enabled = true
@@ -3898,6 +3899,23 @@ tracks/34/path = NodePath("CharacterArmature/Skeleton3D:PoleTarget.R")
 tracks/34/interp = 1
 tracks/34/loop_wrap = true
 tracks/34/keys = PackedFloat32Array(0, 1, -3.55273e-15, -5.96046e-07, 3.38813e-21, 1, 0.0333333, 1, 0.00732221, -5.9603e-07, -8.72877e-10, 0.999973, 0.0666667, 1, 0.0294572, -5.95788e-07, -3.51158e-09, 0.999566, 0.1, 1, 0.0656957, -5.94759e-07, -7.83155e-09, 0.99784, 0.133333, 1, 0.11335, -5.92205e-07, -1.35123e-08, 0.993555, 0.2, 1, 0.220757, -5.81341e-07, -2.63163e-08, 0.975329, 0.233333, 1, 0.267157, -5.74382e-07, -3.18477e-08, 0.963653, 0.266667, 1, 0.301937, -5.68228e-07, -3.59936e-08, 0.953328, 0.3, 1, 0.322967, -5.64104e-07, -3.85007e-08, 0.94641, 0.333333, 1, 0.329888, -5.6268e-07, -3.93257e-08, 0.94402, 0.366667, 1, 0.325093, -5.6367e-07, -3.87541e-08, 0.945682, 0.4, 1, 0.310519, -5.66582e-07, -3.70168e-08, 0.950567, 0.433333, 1, 0.286185, -5.71116e-07, -3.41159e-08, 0.958174, 0.466667, 1, 0.252809, -5.76685e-07, -3.01372e-08, 0.967516, 0.5, 1, 0.212179, -5.82475e-07, -2.52937e-08, 0.977231, 0.566667, 1, 0.122075, -5.91589e-07, -1.45525e-08, 0.992521, 0.6, 1, 0.0805155, -5.94111e-07, -9.59821e-09, 0.996753, 0.633333, 1, 0.0459257, -5.95418e-07, -5.47479e-09, 0.998945, 0.666667, 1, 0.0204442, -5.95922e-07, -2.43715e-09, 0.999791, 0.7, 1, 0.00507481, -5.96039e-07, -6.05007e-10, 0.999987, 0.733333, 1, -3.55273e-15, -5.96046e-07, 3.38813e-21, 1)
+tracks/35/type = "method"
+tracks/35/imported = false
+tracks/35/enabled = true
+tracks/35/path = NodePath("..")
+tracks/35/interp = 1
+tracks/35/loop_wrap = true
+tracks/35/keys = {
+"times": PackedFloat32Array(0.13, 0.5),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"play_footstep_sfx"
+}, {
+"args": [],
+"method": &"play_footstep_sfx"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_38mvs"]
 resource_name = "Walk"
@@ -4395,6 +4413,23 @@ tracks/34/path = NodePath("CharacterArmature/Skeleton3D:PoleTarget.R")
 tracks/34/interp = 1
 tracks/34/loop_wrap = true
 tracks/34/keys = PackedFloat32Array(0, 1, -3.55273e-15, -5.96046e-07, 3.38813e-21, 1)
+tracks/35/type = "method"
+tracks/35/imported = false
+tracks/35/enabled = true
+tracks/35/path = NodePath("..")
+tracks/35/interp = 1
+tracks/35/loop_wrap = true
+tracks/35/keys = {
+"times": PackedFloat32Array(0.1, 0.6),
+"transitions": PackedFloat32Array(1, 1),
+"values": [{
+"args": [],
+"method": &"play_footstep_sfx"
+}, {
+"args": [],
+"method": &"play_footstep_sfx"
+}]
+}
 
 [sub_resource type="Animation" id="Animation_x7wcb"]
 resource_name = "Wave"
@@ -4931,6 +4966,9 @@ corner_radius_bottom_left = 8
 [node name="PlayerRemote" type="CharacterBody3D" node_paths=PackedStringArray("name_tag_label", "weapon_holder", "health_bar")]
 collision_layer = 2
 collision_mask = 3
+floor_stop_on_slope = false
+floor_snap_length = 0.2
+safe_margin = 0.01
 script = ExtResource("1_55a7p")
 name_tag_label = NodePath("SubViewport/PlayerInfo/VBoxContainer/PlayerNameLabel")
 weapon_holder = NodePath("character_soldier/CharacterArmature/Skeleton3D/WeaponHolderBone/WeaponHolder")
@@ -5369,7 +5407,7 @@ bones/59/rotation = Quaternion(-3.55273e-15, -5.96046e-07, 3.38813e-21, 1)
 bones/59/scale = Vector3(1, 1, 1)
 
 [node name="Head_2" type="BoneAttachment3D" parent="character_soldier/CharacterArmature/Skeleton3D"]
-transform = Transform3D(0.586174, 1.54812e-08, -1.41154e-08, -1.52463e-08, 0.58609, 0.00991702, 1.43482e-08, -0.00991702, 0.58609, -3.17232e-08, -0.115201, 0.143613)
+transform = Transform3D(0.586174, 1.54812e-08, -1.40863e-08, -1.52413e-08, 0.58609, 0.00991701, 1.43191e-08, -0.00991701, 0.58609, -3.17232e-08, -0.115201, 0.143613)
 bone_name = "Head_2"
 bone_idx = 8
 
@@ -5379,7 +5417,7 @@ mesh = SubResource("ArrayMesh_6qh0i")
 skeleton = NodePath("")
 
 [node name="ShoulderPad_L" type="BoneAttachment3D" parent="character_soldier/CharacterArmature/Skeleton3D"]
-transform = Transform3D(0.387066, 0.439086, 0.0313509, -0.433709, 0.387532, -0.0729001, -0.0753341, 0.0249414, 0.580778, 0.368279, 1.18833, 0.0242412)
+transform = Transform3D(0.387066, 0.439086, 0.0313509, -0.433709, 0.387532, -0.0729001, -0.075334, 0.0249414, 0.580778, 0.368279, 1.18833, 0.0242413)
 bone_name = "ShoulderPad.L"
 bone_idx = 23
 
@@ -5388,7 +5426,7 @@ mesh = SubResource("ArrayMesh_lkk3s")
 skeleton = NodePath("")
 
 [node name="ShoulderPad_R" type="BoneAttachment3D" parent="character_soldier/CharacterArmature/Skeleton3D"]
-transform = Transform3D(0.20257, -0.222828, 0.502905, 0.117178, 0.541103, 0.192553, -0.537432, 0.0339893, 0.231539, -0.288181, 1.31998, 0.271437)
+transform = Transform3D(0.202571, -0.222828, 0.502904, 0.117178, 0.541103, 0.192553, -0.537432, 0.0339894, 0.231539, -0.288181, 1.31998, 0.271437)
 bone_name = "ShoulderPad.R"
 bone_idx = 52
 
@@ -5402,7 +5440,7 @@ mesh = SubResource("ArrayMesh_xbvh6")
 skin = SubResource("Skin_3n437")
 
 [node name="WeaponHolderBone" type="BoneAttachment3D" parent="character_soldier/CharacterArmature/Skeleton3D"]
-transform = Transform3D(0.156134, -0.955409, 0.250632, -0.430758, 0.16248, 0.887721, -0.888858, -0.246566, -0.386181, -0.343376, 1.34911, 1.02346)
+transform = Transform3D(0.156135, -0.955408, 0.250633, -0.430758, 0.162481, 0.88772, -0.888858, -0.246566, -0.386181, -0.343377, 1.34911, 1.02346)
 bone_name = "Shotgun"
 bone_idx = 45
 
