@@ -1,4 +1,4 @@
-[gd_scene load_steps=188 format=4 uid="uid://bhbjnt04pbjkd"]
+[gd_scene load_steps=189 format=4 uid="uid://bhbjnt04pbjkd"]
 
 [ext_resource type="Texture2D" uid="uid://eeb52qhocefr" path="res://asset_packs/tutorial-fps-assets/textures/kloofendal_48d_partly_cloudy_puresky_4k.hdr" id="1_3p6m5"]
 [ext_resource type="PackedScene" uid="uid://cp6qm25ddouoj" path="res://maps/assets/fx/rain.tscn" id="2_r17xs"]
@@ -30,8 +30,10 @@
 [ext_resource type="Texture2D" uid="uid://d0bs4hldhnd3r" path="res://asset_packs/LowPoly-ConstructionFPS/Models/Walls/Floor_04_Texture_FPSMap6_01.png" id="25_q5pom"]
 [ext_resource type="Texture2D" uid="uid://c6d1ld8dbx8nc" path="res://asset_packs/LowPoly-GasStationFPS/Models/RoadPart_02_Texture_01.png" id="28_7o8tt"]
 [ext_resource type="Texture2D" uid="uid://inrjpcktbcv5" path="res://asset_packs/LowPoly-Shipping/Models/Props/WoodenPlank_01_Texture_FPSMap4_01.png" id="31_6ejp1"]
+[ext_resource type="PackedScene" path="res://player/buyables/door_buyable.tscn" id="31_xa47m"]
 [ext_resource type="Texture2D" uid="uid://8g7lcmf6p8uj" path="res://asset_packs/LowPoly-ConstructionFPS/Models/Walls/Door_01_Texture_FPSMap6_01.png" id="32_kiwkg"]
-[ext_resource type="PackedScene" path="res://player/buyables/door_barrier.tscn" id="buyables_door"]
+[ext_resource type="PackedScene" uid="uid://b2o8jh8eg3npd" path="res://player/buyables/weapon_forge.tscn" id="34_8e58u"]
+[ext_resource type="PackedScene" path="res://player/buyables/perk_machine.tscn" id="35_8e58u"]
 [ext_resource type="PackedScene" uid="uid://8t7pmv7o3cvt" path="res://player/buyables/weapon_wallbuy.tscn" id="buyables_weapon"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_posn1"]
@@ -1548,9 +1550,6 @@ points = PackedVector3Array(0.191682, -0.0288863, -1.2115, 5.63197, 4.93063, -0.
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jn48t"]
 points = PackedVector3Array(0.0953722, 0.999999, 0.744185, -0.211905, -0.0118048, -0.761756, 0.216667, -0.0118048, -0.761756, -0.211905, -0.0118048, 0.761756, -0.116634, 1.0118, -0.761756, 0.216667, -0.0118048, 0.761756, 0.121354, 0.987957, -0.761756, -0.116634, 1.0118, 0.761756, 0.121354, 0.987957, 0.761756, -0.211905, 0.0358888, -0.761756, 0.216667, 0.012042, 0.761756, -0.211905, 0.0358888, 0.761756, 0.216667, 0.012042, -0.761756, 0.0953723, 1, -0.744186)
 
-[sub_resource type="BoxShape3D" id="BoxShape3D_cxupw"]
-size = Vector3(0.9, 2.6, 0.1)
-
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_iq6rf"]
 resource_name = "FPS6_01"
 cull_mode = 2
@@ -1631,22 +1630,22 @@ script = ExtResource("3_2ge8b")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
 [node name="BluePlayerSpawnPoint5" type="Node3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, -1, 0, 30)
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, -19.1, 0, 30)
 script = ExtResource("3_2ge8b")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
 [node name="BluePlayerSpawnPoint6" type="Node3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 1, 0, 30)
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 18.7, 0, 30)
 script = ExtResource("3_2ge8b")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
 [node name="BluePlayerSpawnPoint7" type="Node3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 3, 0, 30)
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 20.7, 0, 30)
 script = ExtResource("3_2ge8b")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
 [node name="BluePlayerSpawnPoint8" type="Node3D" parent="SpawnPoints"]
-transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, -3, 0, 30)
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, -21.1, 0, 30)
 script = ExtResource("3_2ge8b")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
@@ -2925,17 +2924,19 @@ shape = SubResource("ConvexPolygonShape3D_jn48t")
 
 [node name="Buyables" type="Node3D" parent="."]
 
+[node name="DoorBuyable" parent="Buyables" node_paths=PackedStringArray("door_mesh") instance=ExtResource("31_xa47m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 12)
+door_mesh = NodePath("Door_01")
+
+[node name="Door_01" type="MeshInstance3D" parent="Buyables/DoorBuyable"]
+mesh = SubResource("ArrayMesh_ocpd4")
+skeleton = NodePath("")
+
 [node name="WeaponWallbuy_SMG" parent="Buyables" instance=ExtResource("buyables_weapon")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 14.8296)
 
-[node name="DoorBarrier_Test" parent="Buyables" instance=ExtResource("buyables_door")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)
-door_id = "door_test"
+[node name="WeaponForge" parent="Buyables" instance=ExtResource("34_8e58u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0, 13)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Buyables/DoorBarrier_Test"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.45, 0.8, -0.0500002)
-shape = SubResource("BoxShape3D_cxupw")
-
-[node name="Door_01" type="MeshInstance3D" parent="Buyables/DoorBarrier_Test"]
-mesh = SubResource("ArrayMesh_ocpd4")
-skeleton = NodePath("")
+[node name="PerkMachine" parent="Buyables" instance=ExtResource("35_8e58u")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 0, 16)

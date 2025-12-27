@@ -1,60 +1,53 @@
-extends Node3D
+extends BuyableBase
 class_name WeaponWallbuy
 
 @export var weapon_id: int = 1
 @export var weapon_cost: int = 1000
 @export var ammo_cost: int = 500
 
-var interact_area: Area3D
-var player_nearby: PlayerLocal = null
 var weapon_display: Node3D
 
 func _ready() -> void:
-	# Instantiate the actual weapon scene based on weapon_id
+	# Set buyable properties
+	buyable_id = "weapon_%d" % weapon_id
+	buyable_name = _get_weapon_name()
+	cost = weapon_cost
+
+	super._ready()
+	print("Weapon wallbuy ready at: ", global_position)
+
+func setup_visuals() -> void:
+	# Create weapon display
 	weapon_display = _create_weapon_display()
 	if weapon_display:
 		weapon_display.position = Vector3(0, 1.5, 0)
-		weapon_display.rotation = Vector3(0, -90, 0)
+		weapon_display.rotation_degrees = Vector3(0, -90, 0)
 		add_child(weapon_display)
 
-	interact_area = Area3D.new()
-	interact_area.collision_layer = 0
-	interact_area.collision_mask = 2
-	var collision = CollisionShape3D.new()
-	var shape = BoxShape3D.new()
-	shape.size = Vector3(2, 2, 2)
-	collision.shape = shape
-	collision.position = Vector3(0, 1, 0)
-	interact_area.add_child(collision)
-	add_child(interact_area)
-	interact_area.body_entered.connect(_on_body_entered)
-	interact_area.body_exited.connect(_on_body_exited)
-	print("Weapon wallbuy ready at: ", global_position)
-
-func _on_body_entered(body: Node3D) -> void:
-	print("Body entered wallbuy: ", body.name)
-	if body is PlayerLocal:
-		print("Player detected!")
-		player_nearby = body
-		_update_prompt()
-
-func _on_body_exited(body: Node3D) -> void:
-	if body == player_nearby:
-		player_nearby = null
-		get_tree().call_group("InteractionPrompt", "hide_prompt")
-
-func _update_prompt() -> void:
-	if not player_nearby:
-		return
+func get_prompt_text() -> String:
 	var weapon_name = _get_weapon_name()
 	var has_weapon = _player_has_weapon()
+
 	if has_weapon:
-		get_tree().call_group("InteractionPrompt", "show_prompt",
-			"Press F to buy ammo for %s\nCost: %d points" % [weapon_name, ammo_cost])
+		return "Press F to refill ammo for %s\nCost: %d points" % [weapon_name, ammo_cost]
 	else:
-		get_tree().call_group("InteractionPrompt", "show_prompt",
-			"Press F to buy %s\nCost: %d points" % [weapon_name, weapon_cost])
-	print("Prompt updated: ", weapon_name)
+		return "Press F to buy %s\nCost: %d points" % [weapon_name, weapon_cost]
+
+func can_interact() -> bool:
+	# Always can interact (buy weapon or ammo)
+	return true
+
+func on_purchase_requested() -> void:
+	var has_weapon = _player_has_weapon()
+
+	if has_weapon:
+		# TODO: Show confirmation UI for ammo purchase
+		# For now, just send purchase request immediately
+		print("Requesting ammo refill for weapon ", weapon_id)
+		get_tree().call_group("Lobby", "try_buy_weapon", weapon_id, true)
+	else:
+		print("Requesting weapon purchase: ", weapon_id)
+		get_tree().call_group("Lobby", "try_buy_weapon", weapon_id, false)
 
 func _get_weapon_name() -> String:
 	match weapon_id:
@@ -67,19 +60,16 @@ func _get_weapon_name() -> String:
 		_: return "Unknown"
 
 func _player_has_weapon() -> bool:
-	if not player_nearby or not player_nearby.weapon_inventory:
-		return false
-	return player_nearby.weapon_inventory.has_weapon(weapon_id)
-
-func _process(_delta: float) -> void:
-	if player_nearby and Input.is_action_just_pressed("interact"):
-		attempt_purchase()
-
-func attempt_purchase() -> void:
 	if not player_nearby:
-		return
-	print("Attempting to buy weapon ", weapon_id)
-	get_tree().call_group("Lobby", "try_buy_weapon", weapon_id)
+		return false
+	if not player_nearby.has_method("get_node"):
+		return false
+
+	var weapon_holder = player_nearby.get_node_or_null("WeaponHolder")
+	if not weapon_holder or not weapon_holder.has_method("has_weapon_in_inventory"):
+		return false
+
+	return weapon_holder.has_weapon_in_inventory(weapon_id)
 
 func _create_weapon_display() -> Node3D:
 	var weapon: Node3D

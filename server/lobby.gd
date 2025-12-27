@@ -10,7 +10,8 @@ var grenades := {}
 var zombies := {}  # For zombies mode
 var player_names_and_teams := {}
 var map_id : int = -1
-var game_mode : int = 0  # 0 = PVP, 1 = Zombies 
+var game_mode : int = 0  # 0 = PVP, 1 = Zombies
+var match_started : bool = false  # Track if match has started 
 
 func get_local_player() -> PlayerLocal:
 	return players.get(multiplayer.get_unique_id())
@@ -194,14 +195,41 @@ func s_start_loading_map(received_map_id: int, received_game_mode: int = 0) -> v
 func map_ready() -> void:
 	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
 		return
+
+	# Remove mode-specific elements
+	if game_mode == 0:  # PVP mode - remove zombie buyables
+		_remove_zombie_buyables()
+
 	c_map_ready.rpc_id(1)
 	
 @rpc("any_peer", "call_remote", "reliable")
 func c_map_ready() -> void:
 	pass
 
+func _remove_zombie_buyables() -> void:
+	# Find and remove all zombie-specific buyables in PVP mode
+	var map_node = get_node_or_null("Map")
+	if not map_node:
+		return
+
+	# Remove all WeaponWallbuy nodes
+	for child in map_node.get_children():
+		_remove_buyables_recursive(child)
+
+func _remove_buyables_recursive(node: Node) -> void:
+	# Check if this node is a buyable
+	if node is WeaponWallbuy or node is DoorBarrier:
+		print("[Lobby] Removing zombie buyable in PVP mode: ", node.name)
+		node.queue_free()
+		return
+
+	# Recursively check children
+	for child in node.get_children():
+		_remove_buyables_recursive(child)
+
 @rpc("authority", "call_remote", "reliable")
 func s_start_match() -> void:
+	match_started = true
 	get_tree().call_group("PlayerLocal", "unfreeze")
 	set_physics_process(true)
 
@@ -331,12 +359,24 @@ func s_spawn_pickup(pickup_name : String, pickup_type : int, pos : Vector3) -> v
 	if not is_inside_tree():
 		return
 
+	# In zombie mode, ignore PVP map pickups (spawned before match starts)
+	if game_mode == 1 and not match_started:
+		return
+
 	var pickup : Pickup = preload("res://player/pickups/pickup.tscn").instantiate()
 	pickup.name = pickup_name
 	pickup.position = pos
 	pickup.pickup_type = pickup_type
 	add_child(pickup, true)
 	pickups[pickup.name] = pickup
+
+	# In zombie mode, hide the platform/base visuals (zombie drops only, after match starts)
+	if game_mode == 1 and match_started:
+		await pickup.ready
+		if pickup.has_node("Platform"):
+			pickup.get_node("Platform").visible = false
+		if pickup.has_node("MeshHolder"):
+			pickup.get_node("MeshHolder").visible = false
 
 @rpc("authority", "call_remote", "reliable")
 func s_pickup_cooldown_started(pickup_name : String) -> void:
@@ -689,10 +729,10 @@ func s_revive_progress_update(progress : float) -> void:
 	get_tree().call_group("ReviveProgress", "update_revive_progress", progress)
 
 # Economy system - Buyables
-func try_buy_weapon(weapon_id: int) -> void:
+func try_buy_weapon(weapon_id: int, is_ammo: bool = false) -> void:
 	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
 		return
-	c_try_buy_weapon.rpc_id(1, weapon_id)
+	c_try_buy_weapon.rpc_id(1, weapon_id, is_ammo)
 
 func try_buy_door(door_id: String) -> void:
 	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
@@ -700,11 +740,29 @@ func try_buy_door(door_id: String) -> void:
 	c_try_buy_door.rpc_id(1, door_id)
 
 @rpc("any_peer", "call_remote", "reliable")
-func c_try_buy_weapon(weapon_id: int) -> void:
+func c_try_buy_weapon(weapon_id: int, is_ammo: bool = false) -> void:
 	pass
 
 @rpc("any_peer", "call_remote", "reliable")
 func c_try_buy_door(door_id: String) -> void:
+	pass
+
+func try_upgrade_weapon(weapon_id: int) -> void:
+	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+	c_try_upgrade_weapon.rpc_id(1, weapon_id)
+
+func try_buy_perk(perk_type: String) -> void:
+	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+	c_try_buy_perk.rpc_id(1, perk_type)
+
+@rpc("any_peer", "call_remote", "reliable")
+func c_try_upgrade_weapon(weapon_id: int) -> void:
+	pass
+
+@rpc("any_peer", "call_remote", "reliable")
+func c_try_buy_perk(perk_type: String) -> void:
 	pass
 
 @rpc("authority", "call_remote", "reliable")
@@ -747,3 +805,42 @@ func s_purchase_failed(reason: String) -> void:
 	# Show error message to player
 	print("Purchase failed: %s" % reason)
 	# TODO: Show UI notification
+
+@rpc("authority", "call_remote", "reliable")
+func s_weapon_upgraded(weapon_id: int) -> void:
+	print("Weapon upgraded: %d" % weapon_id)
+	var local_player := get_local_player()
+	if not local_player:
+		return
+
+	# Apply weapon upgrade stats
+	var weapon_holder = local_player.get_node_or_null("WeaponHolder")
+	if not weapon_holder:
+		return
+
+	var weapon = weapon_holder.weapons_cache.get(weapon_id)
+	if weapon:
+		# Mark as upgraded and apply bonuses
+		weapon.is_upgraded = true
+		# TODO: Apply upgrade effects (+50% damage, +50% ammo, +33% mag size)
+		print("Weapon %d upgraded successfully!" % weapon_id)
+
+@rpc("authority", "call_remote", "reliable")
+func s_perk_purchased(perk_type: String) -> void:
+	print("Perk purchased: %s" % perk_type)
+	var local_player := get_local_player()
+	if not local_player:
+		return
+
+	# TODO: Apply perk effects based on perk_type
+	# This will need to be implemented per-perk
+	# For now, just track that player has it
+	if not local_player.has_meta("perks"):
+		local_player.set_meta("perks", [])
+
+	var perks = local_player.get_meta("perks")
+	if not perk_type in perks:
+		perks.append(perk_type)
+		local_player.set_meta("perks", perks)
+
+	print("Perk %s applied successfully!" % perk_type)

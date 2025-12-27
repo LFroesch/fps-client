@@ -7,129 +7,53 @@ extends Control
 @onready var ammo_label: Label = $AmmoContainer/AmmoLabel
 @onready var reload_prompt: Label = $AmmoContainer/ReloadPrompt
 
-# Zombies mode HUD elements (optional, will be created if not present)
-@onready var points_label: Label = $ZombiesHUD/PointsLabel if has_node("ZombiesHUD/PointsLabel") else null
-@onready var wave_label: Label = $ZombiesHUD/WaveLabel if has_node("ZombiesHUD/WaveLabel") else null
-@onready var zombies_remaining_label: Label = $ZombiesHUD/ZombiesRemainingLabel if has_node("ZombiesHUD/ZombiesRemainingLabel") else null
-@onready var break_timer_label: Label = $ZombiesHUD/BreakTimerLabel if has_node("ZombiesHUD/BreakTimerLabel") else null
-@onready var kills_label: Label = $ZombiesHUD/KillsLabel if has_node("ZombiesHUD/KillsLabel") else null
-@onready var downs_label: Label = $ZombiesHUD/DownsLabel if has_node("ZombiesHUD/DownsLabel") else null
-@onready var teammate_status_container: VBoxContainer = $ZombiesHUD/TeammateStatusContainer if has_node("ZombiesHUD/TeammateStatusContainer") else null
-@onready var zombies_hud: Control = $ZombiesHUD if has_node("ZombiesHUD") else null
+# Zombies mode HUD elements (instantiated from scene in _ready)
+var points_label: Label = null
+var wave_label: Label = null
+var zombies_remaining_label: Label = null
+var break_timer_label: Label = null
+var kills_label: Label = null
+var downs_label: Label = null
+var teammate_status_container: VBoxContainer = null
+var zombies_hud: Control = null
 
 var player_kills := 0
 var player_downs := 0
 var teammate_cards := {}  # Dictionary to track teammate status cards
-var waiting_label: Label = null  # "Waiting for next round" label
 
 const DAMAGE_NUMBER_SCENE := preload("res://ui/hud/damage_number.tscn")
 const TEAMMATE_STATUS_CARD_SCENE := preload("res://ui/hud/teammate_status_card.tscn")
+const ZOMBIE_HUD_SCENE := preload("res://ui/hud/zombie_hud.tscn")
 
 func _ready() -> void:
 	add_to_group("HUDManager")
 
-	# Create zombies HUD dynamically if it doesn't exist
-	if not has_node("ZombiesHUD"):
-		create_zombies_hud()
+	# Instantiate zombie HUD from scene if it doesn't exist
+	if not has_node("ZombieHUD"):
+		zombies_hud = ZOMBIE_HUD_SCENE.instantiate()
+		add_child(zombies_hud)
+
+		# Get references to all zombie HUD elements
+		points_label = zombies_hud.get_node("MarginContainer/StatsContainer/PointsLabel")
+		wave_label = zombies_hud.get_node("MarginContainer/StatsContainer/WaveLabel")
+		zombies_remaining_label = zombies_hud.get_node("MarginContainer/StatsContainer/ZombiesRemainingLabel")
+		break_timer_label = zombies_hud.get_node("BreakTimerLabel")
+		kills_label = zombies_hud.get_node("MarginContainer/StatsContainer/KillsLabel")
+		downs_label = zombies_hud.get_node("MarginContainer/StatsContainer/DownsLabel")
+		teammate_status_container = zombies_hud.get_node("TeammateStatusContainer")
 	else:
-		zombies_hud = $ZombiesHUD
-		points_label = zombies_hud.get_node("PointsLabel") if zombies_hud.has_node("PointsLabel") else null
-		wave_label = zombies_hud.get_node("WaveLabel") if zombies_hud.has_node("WaveLabel") else null
-		zombies_remaining_label = zombies_hud.get_node("ZombiesRemainingLabel") if zombies_hud.has_node("ZombiesRemainingLabel") else null
+		zombies_hud = $ZombieHUD
+		points_label = zombies_hud.get_node("MarginContainer/StatsContainer/PointsLabel") if zombies_hud.has_node("MarginContainer/StatsContainer/PointsLabel") else null
+		wave_label = zombies_hud.get_node("MarginContainer/StatsContainer/WaveLabel") if zombies_hud.has_node("MarginContainer/StatsContainer/WaveLabel") else null
+		zombies_remaining_label = zombies_hud.get_node("MarginContainer/StatsContainer/ZombiesRemainingLabel") if zombies_hud.has_node("MarginContainer/StatsContainer/ZombiesRemainingLabel") else null
 		break_timer_label = zombies_hud.get_node("BreakTimerLabel") if zombies_hud.has_node("BreakTimerLabel") else null
-		kills_label = zombies_hud.get_node("KillsLabel") if zombies_hud.has_node("KillsLabel") else null
-		downs_label = zombies_hud.get_node("DownsLabel") if zombies_hud.has_node("DownsLabel") else null
+		kills_label = zombies_hud.get_node("MarginContainer/StatsContainer/KillsLabel") if zombies_hud.has_node("MarginContainer/StatsContainer/KillsLabel") else null
+		downs_label = zombies_hud.get_node("MarginContainer/StatsContainer/DownsLabel") if zombies_hud.has_node("MarginContainer/StatsContainer/DownsLabel") else null
 		teammate_status_container = zombies_hud.get_node("TeammateStatusContainer") if zombies_hud.has_node("TeammateStatusContainer") else null
 
 	# Hide zombies HUD by default (shown only in zombies mode)
 	if zombies_hud:
 		zombies_hud.visible = false
-
-func create_zombies_hud() -> void:
-	# Create container
-	zombies_hud = Control.new()
-	zombies_hud.name = "ZombiesHUD"
-	zombies_hud.set_anchors_preset(Control.PRESET_FULL_RECT)
-	zombies_hud.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	add_child(zombies_hud)
-
-	# Create VBox for organizing labels
-	var vbox = VBoxContainer.new()
-	vbox.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	vbox.offset_left = -300
-	vbox.offset_top = 20
-	vbox.offset_right = -20
-	vbox.add_theme_constant_override("separation", 10)
-	zombies_hud.add_child(vbox)
-
-	# Wave label
-	wave_label = Label.new()
-	wave_label.name = "WaveLabel"
-	wave_label.text = "Wave 1"
-	wave_label.add_theme_font_size_override("font_size", 28)
-	wave_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	wave_label.add_theme_constant_override("outline_size", 4)
-	vbox.add_child(wave_label)
-
-	# Zombies remaining label
-	zombies_remaining_label = Label.new()
-	zombies_remaining_label.name = "ZombiesRemainingLabel"
-	zombies_remaining_label.text = "Zombies: 0"
-	zombies_remaining_label.add_theme_font_size_override("font_size", 20)
-	zombies_remaining_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	zombies_remaining_label.add_theme_constant_override("outline_size", 3)
-	vbox.add_child(zombies_remaining_label)
-
-	# Points label
-	points_label = Label.new()
-	points_label.name = "PointsLabel"
-	points_label.text = "Points: 0"
-	points_label.add_theme_font_size_override("font_size", 24)
-	points_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	points_label.add_theme_constant_override("outline_size", 3)
-	vbox.add_child(points_label)
-
-	# Kills label
-	kills_label = Label.new()
-	kills_label.name = "KillsLabel"
-	kills_label.text = "Kills: 0"
-	kills_label.add_theme_font_size_override("font_size", 20)
-	kills_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	kills_label.add_theme_constant_override("outline_size", 3)
-	vbox.add_child(kills_label)
-
-	# Downs label
-	downs_label = Label.new()
-	downs_label.name = "DownsLabel"
-	downs_label.text = "Downs: 0"
-	downs_label.add_theme_font_size_override("font_size", 20)
-	downs_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	downs_label.add_theme_constant_override("outline_size", 3)
-	vbox.add_child(downs_label)
-
-	# Break timer label (centered at top, below the stats)
-	break_timer_label = Label.new()
-	break_timer_label.name = "BreakTimerLabel"
-	break_timer_label.text = "Next wave in: 10s"
-	break_timer_label.set_anchors_preset(Control.PRESET_CENTER_TOP)
-	break_timer_label.offset_top = 250  # Moved down to avoid overlap with stats
-	break_timer_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	break_timer_label.add_theme_font_size_override("font_size", 32)
-	break_timer_label.add_theme_color_override("font_color", Color.YELLOW)
-	break_timer_label.add_theme_color_override("font_outline_color", Color.BLACK)
-	break_timer_label.add_theme_constant_override("outline_size", 5)
-	break_timer_label.visible = false
-	zombies_hud.add_child(break_timer_label)
-
-	# Teammate status container (left side)
-	teammate_status_container = VBoxContainer.new()
-	teammate_status_container.name = "TeammateStatusContainer"
-	teammate_status_container.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-	teammate_status_container.offset_left = 20
-	teammate_status_container.offset_top = -100
-	teammate_status_container.offset_bottom = 100
-	teammate_status_container.add_theme_constant_override("separation", 8)
-	zombies_hud.add_child(teammate_status_container)
 
 func show_hit_marker(is_headshot := false) -> void:
 	if hit_marker:
@@ -283,26 +207,9 @@ func clear_teammates() -> void:
 
 # Waiting for round UI
 func show_waiting_for_round() -> void:
-	if not waiting_label:
-		waiting_label = Label.new()
-		waiting_label.name = "WaitingLabel"
-		waiting_label.text = "WAITING FOR NEXT ROUND"
-		waiting_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		waiting_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-		waiting_label.add_theme_font_size_override("font_size", 48)
-		waiting_label.add_theme_color_override("font_color", Color(1, 0, 0, 1))
-
-		# Position in center of screen
-		waiting_label.anchors_preset = Control.PRESET_CENTER
-		waiting_label.offset_left = -300
-		waiting_label.offset_top = -50
-		waiting_label.offset_right = 300
-		waiting_label.offset_bottom = 50
-
-		add_child(waiting_label)
-
-	waiting_label.visible = true
+	if zombies_hud and zombies_hud.has_node("WaitingLabel"):
+		zombies_hud.get_node("WaitingLabel").visible = true
 
 func hide_waiting_for_round() -> void:
-	if waiting_label:
-		waiting_label.visible = false
+	if zombies_hud and zombies_hud.has_node("WaitingLabel"):
+		zombies_hud.get_node("WaitingLabel").visible = false

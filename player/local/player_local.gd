@@ -383,10 +383,15 @@ func update_grenades_left(grenades_left : int) -> void:
 	grenade_amount_label.text = str(grenades_left)
 
 func replenish_ammo() -> void:
-	if weapon_holder.weapon == null:
-		return
-	var weapon_data := WeaponConfig.get_weapon_data(weapon_holder.weapon.weapon_id)
-	weapon_holder.weapon.reserve_ammo = weapon_data.reserve_ammo
+	# Replenish ammo for ALL weapons in inventory
+	for weapon_id in weapon_holder_node.weapons_cache.keys():
+		var weapon_instance = weapon_holder_node.weapons_cache[weapon_id]
+		var weapon_data := WeaponConfig.get_weapon_data(weapon_id)
+
+		# Fill reserve ammo
+		weapon_instance.reserve_ammo = weapon_data.reserve_ammo
+		# Fill current magazine
+		weapon_instance.current_ammo = weapon_instance.mag_size
 
 func update_health_bar(current_health : int, max_health : int, changed_amount: int) -> void:
 	super(current_health, max_health, changed_amount)
