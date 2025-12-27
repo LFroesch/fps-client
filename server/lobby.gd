@@ -251,7 +251,10 @@ func s_send_world_state(new_world_state : Dictionary) -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func s_start_weapon_selection() -> void:
-	get_tree().call_group("WeaponSelectionUI", "activate", map_id)
+	if game_mode == 1:  # Zombies mode
+		get_tree().call_group("ZombiesCountdownUI", "activate", map_id)
+	else:  # PvP mode
+		get_tree().call_group("WeaponSelectionUI", "activate", map_id)
 
 func weapon_selected(weapon_id : int) -> void:
 	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
@@ -260,6 +263,14 @@ func weapon_selected(weapon_id : int) -> void:
 
 @rpc("any_peer", "call_remote", "reliable")
 func c_weapon_selected(weapon_id : int) -> void:
+	pass
+
+@rpc("any_peer", "call_remote", "reliable")
+func c_debug_add_points(amount : int) -> void:
+	pass
+
+@rpc("any_peer", "call_remote", "reliable")
+func c_debug_damage_or_kill(damage : int) -> void:
 	pass
 
 func local_shot_fired() -> void:
@@ -476,7 +487,6 @@ func s_spawn_zombie(zombie_id : int, position : Vector3, zombie_type : int) -> v
 	var zombie : Node3D = preload("res://player/zombie/zombie_remote.tscn").instantiate()
 	zombie.zombie_type = zombie_type
 	zombie.name = str(zombie_id)
-	zombie.global_position = position
 
 	# Set health based on type
 	match zombie_type:
@@ -490,6 +500,7 @@ func s_spawn_zombie(zombie_id : int, position : Vector3, zombie_type : int) -> v
 	zombie.current_health = zombie.max_health
 
 	add_child(zombie, true)
+	zombie.global_position = position  # Set position AFTER adding to tree
 	zombies[zombie_id] = zombie
 
 @rpc("authority", "call_remote", "reliable")
@@ -497,9 +508,10 @@ func s_zombie_died(zombie_id : int) -> void:
 	if zombies.has(zombie_id) and is_instance_valid(zombies.get(zombie_id)):
 		var zombie = zombies.get(zombie_id)
 		# Spawn death effect
-		var eliminated_fx := preload("res://player/player_eliminated_effects.tscn").instantiate()
-		eliminated_fx.global_position = zombie.global_position
-		add_child(eliminated_fx)
+		if zombie.is_inside_tree():
+			var eliminated_fx := preload("res://player/player_eliminated_effects.tscn").instantiate()
+			eliminated_fx.global_position = zombie.global_position
+			add_child(eliminated_fx)
 
 		zombie.queue_free()
 		zombies.erase(zombie_id)
@@ -582,6 +594,46 @@ func s_player_revived(player_id : int) -> void:
 		# Re-enable local player controls
 		var local_player := get_local_player()
 		if local_player:
+			local_player.unfreeze()
+
+@rpc("authority", "call_remote", "reliable")
+func s_player_waiting_for_respawn(player_id : int) -> void:
+	print("Player ", player_id, " died - waiting for next round")
+
+	# Make the dead player invisible to others
+	if players.has(player_id) and is_instance_valid(players.get(player_id)):
+		var dead_player = players.get(player_id)
+		dead_player.set_visible(false)
+
+	# If this is the local player, hide downed overlay and freeze
+	if player_id == multiplayer.get_unique_id():
+		get_tree().call_group("DownedOverlay", "hide_downed")
+		get_tree().call_group("HUDManager", "show_waiting_for_round")
+		var local_player := get_local_player()
+		if local_player:
+			local_player.freeze()
+			# Start spectator mode
+			local_player.enter_spectator_mode()
+
+@rpc("authority", "call_remote", "reliable")
+func s_player_respawned(player_id : int) -> void:
+	print("Player ", player_id, " respawned for new round")
+
+	# Make the respawned player visible again
+	if players.has(player_id) and is_instance_valid(players.get(player_id)):
+		var respawned_player = players.get(player_id)
+		respawned_player.set_visible(true)
+
+	# Update teammate status card to show player as alive (not downed)
+	if game_mode == 1:
+		get_tree().call_group("HUDManager", "update_teammate_downed", player_id, false)
+
+	# If this is the local player, hide waiting UI and unfreeze
+	if player_id == multiplayer.get_unique_id():
+		get_tree().call_group("HUDManager", "hide_waiting_for_round")
+		var local_player := get_local_player()
+		if local_player:
+			local_player.exit_spectator_mode()
 			local_player.unfreeze()
 
 @rpc("authority", "call_remote", "reliable")

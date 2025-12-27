@@ -1,9 +1,10 @@
-[gd_scene load_steps=187 format=4 uid="uid://bhbjnt04pbjkd"]
+[gd_scene load_steps=188 format=4 uid="uid://bhbjnt04pbjkd"]
 
 [ext_resource type="Texture2D" uid="uid://eeb52qhocefr" path="res://asset_packs/tutorial-fps-assets/textures/kloofendal_48d_partly_cloudy_puresky_4k.hdr" id="1_3p6m5"]
 [ext_resource type="PackedScene" uid="uid://cp6qm25ddouoj" path="res://maps/assets/fx/rain.tscn" id="2_r17xs"]
 [ext_resource type="Script" uid="uid://dwqve5xxn68mx" path="res://player/spawn_point/player_spawn_point.gd" id="3_2ge8b"]
 [ext_resource type="PackedScene" uid="uid://b701rjdsnk1r1" path="res://ui/weapon_selection/weapon_selection_ui.tscn" id="4_ah5l1"]
+[ext_resource type="PackedScene" path="res://ui/zombies_countdown/zombies_countdown_ui.tscn" id="4_countdown"]
 [ext_resource type="PackedScene" uid="uid://cj25o5j8n5gn0" path="res://ui/match_info/match_info_ui.tscn" id="5_ajawo"]
 [ext_resource type="Texture2D" uid="uid://dvyuyaf6p82f5" path="res://asset_packs/LowPoly-Shipping/Models/Buildings/Wall_02_Texture_FPSMap4_01.png" id="6_7o8tt"]
 [ext_resource type="Texture2D" uid="uid://obf1c0k6g0cy" path="res://asset_packs/LowPoly-Shipping/Models/Buildings/Wall_01_Texture_FPSMap4_01.png" id="7_6ejp1"]
@@ -31,7 +32,7 @@
 [ext_resource type="Texture2D" uid="uid://inrjpcktbcv5" path="res://asset_packs/LowPoly-Shipping/Models/Props/WoodenPlank_01_Texture_FPSMap4_01.png" id="31_6ejp1"]
 [ext_resource type="Texture2D" uid="uid://8g7lcmf6p8uj" path="res://asset_packs/LowPoly-ConstructionFPS/Models/Walls/Door_01_Texture_FPSMap6_01.png" id="32_kiwkg"]
 [ext_resource type="PackedScene" path="res://player/buyables/door_barrier.tscn" id="buyables_door"]
-[ext_resource type="PackedScene" path="res://player/buyables/weapon_wallbuy.tscn" id="buyables_weapon"]
+[ext_resource type="PackedScene" uid="uid://8t7pmv7o3cvt" path="res://player/buyables/weapon_wallbuy.tscn" id="buyables_weapon"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_posn1"]
 panorama = ExtResource("1_3p6m5")
@@ -1650,6 +1651,9 @@ script = ExtResource("3_2ge8b")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
 [node name="WeaponSelectionUI" parent="." instance=ExtResource("4_ah5l1")]
+visible = false
+
+[node name="ZombiesCountdownUI" parent="." instance=ExtResource("4_countdown")]
 
 [node name="MatchInfoUI" parent="." instance=ExtResource("5_ajawo")]
 
@@ -2922,7 +2926,7 @@ shape = SubResource("ConvexPolygonShape3D_jn48t")
 [node name="Buyables" type="Node3D" parent="."]
 
 [node name="WeaponWallbuy_SMG" parent="Buyables" instance=ExtResource("buyables_weapon")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 15)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0, 14.8296)
 
 [node name="DoorBarrier_Test" parent="Buyables" instance=ExtResource("buyables_door")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 10)

@@ -1,7 +1,8 @@
-[gd_scene load_steps=48 format=3 uid="uid://dftcr3yhiirwb"]
+[gd_scene load_steps=49 format=3 uid="uid://dftcr3yhiirwb"]
 
 [ext_resource type="Script" uid="uid://dwqve5xxn68mx" path="res://player/spawn_point/player_spawn_point.gd" id="1_mv8ka"]
 [ext_resource type="PackedScene" uid="uid://b701rjdsnk1r1" path="res://ui/weapon_selection/weapon_selection_ui.tscn" id="2_5krk4"]
+[ext_resource type="PackedScene" path="res://ui/zombies_countdown/zombies_countdown_ui.tscn" id="3_5krk4"]
 [ext_resource type="PackedScene" uid="uid://cj25o5j8n5gn0" path="res://ui/match_info/match_info_ui.tscn" id="3_5rgx2"]
 
 [sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_mv8ka"]
@@ -178,6 +179,8 @@ script = ExtResource("1_mv8ka")
 metadata/_custom_type_script = "uid://dwqve5xxn68mx"
 
 [node name="WeaponSelectionUI" parent="." instance=ExtResource("2_5krk4")]
+
+[node name="ZombiesCountdownUI" parent="." instance=ExtResource("3_5krk4")]
 
 [node name="MatchInfoUI" parent="." instance=ExtResource("3_5rgx2")]
 

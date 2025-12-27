@@ -20,6 +20,7 @@ extends Control
 var player_kills := 0
 var player_downs := 0
 var teammate_cards := {}  # Dictionary to track teammate status cards
+var waiting_label: Label = null  # "Waiting for next round" label
 
 const DAMAGE_NUMBER_SCENE := preload("res://ui/hud/damage_number.tscn")
 const TEAMMATE_STATUS_CARD_SCENE := preload("res://ui/hud/teammate_status_card.tscn")
@@ -279,3 +280,29 @@ func clear_teammates() -> void:
 		if is_instance_valid(card):
 			card.queue_free()
 	teammate_cards.clear()
+
+# Waiting for round UI
+func show_waiting_for_round() -> void:
+	if not waiting_label:
+		waiting_label = Label.new()
+		waiting_label.name = "WaitingLabel"
+		waiting_label.text = "WAITING FOR NEXT ROUND"
+		waiting_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		waiting_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+		waiting_label.add_theme_font_size_override("font_size", 48)
+		waiting_label.add_theme_color_override("font_color", Color(1, 0, 0, 1))
+
+		# Position in center of screen
+		waiting_label.anchors_preset = Control.PRESET_CENTER
+		waiting_label.offset_left = -300
+		waiting_label.offset_top = -50
+		waiting_label.offset_right = 300
+		waiting_label.offset_bottom = 50
+
+		add_child(waiting_label)
+
+	waiting_label.visible = true
+
+func hide_waiting_for_round() -> void:
+	if waiting_label:
+		waiting_label.visible = false

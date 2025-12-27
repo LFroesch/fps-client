@@ -44,6 +44,11 @@ var revive_progress := 0.0
 const REVIVE_TIME := 3.0  # Seconds to complete revive
 const REVIVE_RANGE := 5.0  # Meters
 
+# Spectator mode
+var is_spectating := false
+var spectator_target_ids : Array[int] = []
+var current_spectator_index := 0
+
 # ADS (Aim Down Sights) variables
 var is_aiming := false
 var default_fov := 75.0
@@ -130,7 +135,9 @@ func unpause() -> void:
 	Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 func freeze() -> void:
-	set_processes(false)
+	# Don't disable processes if spectating (need physics for camera updates)
+	if not is_spectating:
+		set_processes(false)
 	is_frozen = true
 
 func unfreeze() -> void:
@@ -144,15 +151,19 @@ func set_processes(enabled : bool) -> void:
 	set_process_input(enabled)
 
 func _physics_process(delta: float) -> void:
-	move(delta)
-	choose_anim()
-	check_shoot_input()
-	check_reload_input()
-	check_throw_grenade_input()
-	check_ads_input()
-	check_revive_input(delta)
-	check_weapon_switch_input()
-	show_nearby_grenades()
+	if is_spectating:
+		update_spectator_camera()
+		check_spectator_input()
+	else:
+		move(delta)
+		choose_anim()
+		check_shoot_input()
+		check_reload_input()
+		check_throw_grenade_input()
+		check_ads_input()
+		check_revive_input(delta)
+		check_weapon_switch_input()
+		show_nearby_grenades()
 
 func move(delta: float):
 	# Don't process movement if chat is open
@@ -384,8 +395,23 @@ func update_health_bar(current_health : int, max_health : int, changed_amount: i
 	get_tree().call_group("HealthChangeMask", "update_mask", current_health / float(max_health))
 	
 func _input(event) -> void:
+	# Don't allow mouse movement during spectator mode
+	if is_spectating:
+		return
+
 	if event is InputEventMouseMotion:
 		look_around(event.relative)
+
+	# Debug keys (zombies mode only)
+	if event is InputEventKey and event.pressed and not event.echo:
+		var lobby := get_tree().get_first_node_in_group("Lobby")
+		if lobby and lobby.game_mode == 1:  # Zombies mode
+			if event.keycode == KEY_1:
+				# Add 1000 points
+				lobby.c_debug_add_points.rpc_id(1, 1000)
+			elif event.keycode == KEY_2:
+				# Deal 50 damage or force death
+				lobby.c_debug_damage_or_kill.rpc_id(1, 50)
 
 func look_around(relative:Vector2):
 	var base_sensitivity = 0.005
@@ -471,3 +497,84 @@ func check_revive_input(delta: float) -> void:
 		is_reviving = false
 		revive_target_id = -1
 		revive_progress = 0.0
+
+# Spectator mode functions
+func enter_spectator_mode() -> void:
+	is_spectating = true
+	spectator_target_ids.clear()
+	current_spectator_index = 0
+
+	# Re-enable physics processing for spectator camera updates (freeze() may have disabled it)
+	if not is_paused:
+		set_processes(true)
+
+	# Get lobby and find alive teammates
+	var lobby := get_tree().get_first_node_in_group("Lobby")
+	if not lobby:
+		return
+
+	# Collect alive teammates (players that are visible)
+	for player_id in lobby.players.keys():
+		if player_id == multiplayer.get_unique_id():
+			continue  # Don't spectate yourself
+
+		var player = lobby.players.get(player_id)
+		if is_instance_valid(player) and player.visible:
+			spectator_target_ids.append(player_id)
+
+	print("Spectator mode: Found %d alive teammates to spectate" % spectator_target_ids.size())
+
+func exit_spectator_mode() -> void:
+	is_spectating = false
+	spectator_target_ids.clear()
+	current_spectator_index = 0
+
+	# Reset camera to default position (local to head/camera shake component)
+	camera.position = Vector3.ZERO
+
+func check_spectator_input() -> void:
+	if Input.is_action_just_pressed("switch_weapon"):  # Tab key cycles teammates
+		print("Spectator: Tab pressed, cycling target")
+		cycle_spectator_target()
+
+func cycle_spectator_target() -> void:
+	if spectator_target_ids.is_empty():
+		return
+
+	current_spectator_index = (current_spectator_index + 1) % spectator_target_ids.size()
+	print("Spectating player: %d" % spectator_target_ids[current_spectator_index])
+
+func update_spectator_camera() -> void:
+	if spectator_target_ids.is_empty():
+		return
+
+	var lobby := get_tree().get_first_node_in_group("Lobby")
+	if not lobby:
+		return
+
+	var target_id := spectator_target_ids[current_spectator_index]
+	var target_player = lobby.players.get(target_id)
+
+	if not is_instance_valid(target_player) or not target_player.visible:
+		# Target died or became invalid, remove from list
+		print("Spectator: Target %d died or invalid, removing from list" % target_id)
+		spectator_target_ids.remove_at(current_spectator_index)
+		if current_spectator_index >= spectator_target_ids.size():
+			current_spectator_index = 0
+		return
+
+	# Position camera above and behind the target player (spectator offset)
+	var offset_up := Vector3.UP * 3.0  # 5 units up
+	var offset_back : Vector3 = target_player.global_transform.basis.z * 3.0  # 5 units back (basis.z is backward)
+	var target_pos : Vector3 = target_player.global_position + offset_up + offset_back
+
+	# Smoothly interpolate camera position to target (prevents jarring movements)
+	camera.global_position = camera.global_position.lerp(target_pos, 0.3)
+
+	# Copy target's rotation for looking around
+	rotation.y = target_player.rotation.y
+
+	# If target has a head node (for looking up/down), copy that too
+	if target_player.has_node("Head"):
+		var target_head = target_player.get_node("Head")
+		head.rotation.x = target_head.rotation.x

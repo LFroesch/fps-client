@@ -14,6 +14,7 @@ func _ready() -> void:
 	weapon_display = _create_weapon_display()
 	if weapon_display:
 		weapon_display.position = Vector3(0, 1.5, 0)
+		weapon_display.rotation = Vector3(0, -90, 0)
 		add_child(weapon_display)
 
 	interact_area = Area3D.new()

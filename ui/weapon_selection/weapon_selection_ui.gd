@@ -5,7 +5,7 @@ extends Control
 
 func activate(map_id: int = 1) -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
-
+	show()
 	# Load the map screenshot
 	var screenshot_path := MapRegistry.get_screenshot_path(map_id)
 	if ResourceLoader.exists(screenshot_path):

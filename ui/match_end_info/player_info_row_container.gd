@@ -30,6 +30,8 @@ func set_data(_player_name : String, _kills_amount : int, _deaths_amount : int) 
 
 func set_zombie_data(_player_name : String, _points : int, _kills : int) -> void:
 	player_name = _player_name
+	kills_amount = _points  # Store points in kills column
+	deaths_amount = _kills  # Store kills in deaths column
 
 	# For zombie mode: kills column shows points, deaths column shows kills
 	if player_name_label:
