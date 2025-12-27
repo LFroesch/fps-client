@@ -1,0 +1,38 @@
+[gd_scene load_steps=2 format=3 uid="uid://c3s8yg5mbqkne"]
+
+[ext_resource type="Script" path="res://ui/map_selection/map_card.gd" id="1_mapcard"]
+
+[node name="MapCard" type="PanelContainer"]
+custom_minimum_size = Vector2(240, 200)
+script = ExtResource("1_mapcard")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+
+[node name="MapThumbnail" type="TextureRect" parent="VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 135)
+layout_mode = 2
+size_flags_vertical = 3
+expand_mode = 1
+stretch_mode = 5
+
+[node name="InfoContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="MapNameLabel" type="Label" parent="VBoxContainer/InfoContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Map Name"
+horizontal_alignment = 1
+
+[node name="SelectButton" type="Button" parent="VBoxContainer/InfoContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+focus_mode = 0
+text = "Play"
+
+[connection signal="pressed" from="VBoxContainer/InfoContainer/SelectButton" to="." method="_on_select_button_pressed"]

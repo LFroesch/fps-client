@@ -1,0 +1,40 @@
+[gd_scene load_steps=6 format=3 uid="uid://bbc6xp2yc7skg"]
+
+[ext_resource type="Script" uid="uid://rqp1edp0eeaa" path="res://player/player_eliminated_effects.gd" id="1_c6o7o"]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_abm25"]
+emission_shape = 3
+emission_box_extents = Vector3(0.2, 0.8, 0.2)
+direction = Vector3(0, 1, 0)
+spread = 80.0
+initial_velocity_min = 2.0
+initial_velocity_max = 4.0
+gravity = Vector3(0, -5, 0)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_wt4cl"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3db5h"]
+transparency = 1
+albedo_color = Color(0.623529, 0, 0, 1)
+albedo_texture = SubResource("CompressedTexture2D_wt4cl")
+billboard_mode = 3
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_mgjkt"]
+material = SubResource("StandardMaterial3D_3db5h")
+size = Vector2(0.07, 0.07)
+
+[node name="PlayerEliminatedEffects" type="Node3D"]
+script = ExtResource("1_c6o7o")
+
+[node name="GPUParticles3D" type="GPUParticles3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+emitting = false
+amount = 16
+lifetime = 0.3
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_abm25")
+draw_pass_1 = SubResource("QuadMesh_mgjkt")

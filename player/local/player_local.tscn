@@ -1,11 +1,10 @@
-[gd_scene load_steps=10 format=3 uid="uid://cwaqdu0mey7gg"]
+[gd_scene load_steps=9 format=3 uid="uid://cwaqdu0mey7gg"]
 
 [ext_resource type="Script" uid="uid://bnmi1tvqyx4fd" path="res://player/local/player_local.gd" id="1_gucd0"]
 [ext_resource type="Script" uid="uid://dygpiuulkydqd" path="res://player/local_weapon_holder.gd" id="2_y8ftr"]
 [ext_resource type="Script" uid="uid://de6pek5twl361" path="res://player/local/camera_shake_component.gd" id="3_dog3v"]
 [ext_resource type="PackedScene" uid="uid://qty0uvl51pci" path="res://ui/hud/hud.tscn" id="3_w115m"]
 [ext_resource type="Script" uid="uid://bnnxupdxg0wkv" path="res://player/local/pause_screen.gd" id="5_xbm03"]
-[ext_resource type="PackedScene" uid="uid://dk3we5bbd8hnb" path="res://ui/settings_widget/settings_widget.tscn" id="6_exmsb"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_s7k6g"]
 radius = 0.25
@@ -108,10 +107,6 @@ text = "Resume"
 layout_mode = 2
 size_flags_horizontal = 4
 text = "Exit Match"
-
-[node name="SettingsWidget" parent="PauseScreen/VBoxContainer" instance=ExtResource("6_exmsb")]
-layout_mode = 2
-size_flags_horizontal = 4
 
 [node name="LineEdit" type="LineEdit" parent="PauseScreen/VBoxContainer"]
 custom_minimum_size = Vector2(200, 40)

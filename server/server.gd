@@ -5,12 +5,12 @@ signal on_cant_connect_to_lobby
 signal on_lobby_locked
 
 #Local
-#const PORT := 7777
-#const ADDRESS := "127.0.0.1"
+const PORT := 7777
+const ADDRESS := "127.0.0.1"
 
 #playit.gg
-const ADDRESS := "147.185.221.16"
-const PORT := 6357
+#const ADDRESS := "rss-hu.gl.at.ply.gg"
+#const PORT := 6357
 
 @onready var clock_sync_timer: Timer = $ClockSyncTimer
 
@@ -81,10 +81,15 @@ func c_cancel_quickplay_search() -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func s_create_lobby_on_clients(lobby_name: String) -> void:
+	print("[CLIENT] s_create_lobby_on_clients called! lobby_name: %s" % lobby_name)
+	print("[CLIENT] Connection status: %d" % peer.get_connection_status())
 	var lobby := Lobby.new()
 	lobby.name = lobby_name
+	print("[CLIENT] Adding lobby as child...")
 	add_child(lobby, true)
+	print("[CLIENT] Emitting on_lobby_locked signal...")
 	on_lobby_locked.emit()
+	print("[CLIENT] Done!")
 
 func _on_clock_sync_timer_timeout() -> void:
 	# Check if peer is connected before attempting RPC

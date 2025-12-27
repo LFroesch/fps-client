@@ -1,0 +1,237 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmhv7u3jrj3vp"]
+
+[ext_resource type="Script" path="res://ui/settings_panel/settings_panel.gd" id="1_settings"]
+
+[node name="SettingsPanel" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_settings")
+
+[node name="Overlay" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.7)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
+custom_minimum_size = Vector2(800, 600)
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
+layout_mode = 2
+theme_override_constants/margin_left = 32
+theme_override_constants/margin_top = 32
+theme_override_constants/margin_right = 32
+theme_override_constants/margin_bottom = 32
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 24
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "Settings"
+horizontal_alignment = 1
+
+[node name="TabContainer" type="TabContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Audio" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+metadata/_tab_index = 0
+
+[node name="MasterVolumeContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MasterVolumeContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MasterVolumeContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Master Volume"
+
+[node name="MasterVolumeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MasterVolumeContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="MasterVolumeSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MasterVolumeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 1.0
+
+[node name="MusicVolumeContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MusicVolumeContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MusicVolumeContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Music Volume"
+
+[node name="MusicVolumeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MusicVolumeContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "70%"
+horizontal_alignment = 2
+
+[node name="MusicVolumeSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MusicVolumeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.7
+
+[node name="SFXVolumeContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/SFXVolumeContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/SFXVolumeContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "SFX Volume"
+
+[node name="SFXVolumeLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/SFXVolumeContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "80%"
+horizontal_alignment = 2
+
+[node name="SFXVolumeSlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/SFXVolumeContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+max_value = 1.0
+step = 0.01
+value = 0.8
+
+[node name="MuteContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MuteContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Mute All"
+
+[node name="MuteCheckBox" type="CheckBox" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Audio/MuteContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="Graphics" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+metadata/_tab_index = 1
+
+[node name="ResolutionContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics/ResolutionContainer"]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 2
+text = "Resolution"
+
+[node name="ResolutionOptionButton" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics/ResolutionContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+focus_mode = 0
+
+[node name="FullscreenContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics/FullscreenContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Fullscreen"
+
+[node name="FullscreenCheckBox" type="CheckBox" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics/FullscreenContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="VsyncContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics/VsyncContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "V-Sync"
+
+[node name="VsyncCheckBox" type="CheckBox" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Graphics/VsyncContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+focus_mode = 0
+
+[node name="Controls" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer"]
+visible = false
+layout_mode = 2
+theme_override_constants/separation = 16
+metadata/_tab_index = 2
+
+[node name="SensitivityContainer" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Controls"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Controls/SensitivityContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Controls/SensitivityContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Mouse Sensitivity"
+
+[node name="SensitivityLabel" type="Label" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Controls/SensitivityContainer/HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 0)
+layout_mode = 2
+text = "0.50"
+horizontal_alignment = 2
+
+[node name="SensitivitySlider" type="HSlider" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/TabContainer/Controls/SensitivityContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 0.1
+max_value = 2.0
+step = 0.01
+value = 0.5
+
+[node name="CloseButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 56)
+layout_mode = 2
+focus_mode = 0
+theme_override_font_sizes/font_size = 24
+text = "Close"

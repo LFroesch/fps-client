@@ -1,0 +1,243 @@
+[gd_scene load_steps=20 format=3 uid="uid://d1gfn3kxdhlt"]
+
+[ext_resource type="Texture2D" uid="uid://eeb52qhocefr" path="res://asset_packs/tutorial-fps-assets/textures/kloofendal_48d_partly_cloudy_puresky_4k.hdr" id="1_3ujtn"]
+[ext_resource type="Script" uid="uid://dwqve5xxn68mx" path="res://player/spawn_point/player_spawn_point.gd" id="2_5yi0u"]
+[ext_resource type="PackedScene" uid="uid://b701rjdsnk1r1" path="res://ui/weapon_selection/weapon_selection_ui.tscn" id="3_heweg"]
+[ext_resource type="PackedScene" uid="uid://cj25o5j8n5gn0" path="res://ui/match_info/match_info_ui.tscn" id="4_13kw8"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_posn1"]
+panorama = ExtResource("1_3ujtn")
+filter = false
+
+[sub_resource type="Sky" id="Sky_270gi"]
+sky_material = SubResource("PanoramaSkyMaterial_posn1")
+radiance_size = 0
+
+[sub_resource type="Environment" id="Environment_c3qe0"]
+background_mode = 2
+sky = SubResource("Sky_270gi")
+sky_custom_fov = 80.0
+ambient_light_color = Color(1, 1, 1, 1)
+ambient_light_sky_contribution = 0.0
+ambient_light_energy = 0.6
+tonemap_mode = 2
+glow_enabled = true
+glow_levels/1 = 2.0
+glow_levels/2 = 2.0
+glow_levels/3 = 2.0
+glow_intensity = 0.6
+glow_strength = 0.5
+glow_bloom = 0.2
+fog_enabled = true
+fog_light_color = Color(0.470588, 0.596078, 0.321569, 1)
+fog_density = 0.002
+fog_aerial_perspective = 0.6
+fog_sky_affect = 0.0
+volumetric_fog_density = 0.04
+volumetric_fog_albedo = Color(0.643137, 0.815686, 0.890196, 1)
+volumetric_fog_emission = Color(0.572549, 0.890196, 0.980392, 1)
+volumetric_fog_emission_energy = 0.1
+volumetric_fog_sky_affect = 0.0
+adjustment_enabled = true
+adjustment_brightness = 1.1
+adjustment_contrast = 1.1
+adjustment_saturation = 1.8
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7x4u1"]
+albedo_color = Color(0.480469, 0.457947, 0.394135, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_ur8uo"]
+material = SubResource("StandardMaterial3D_7x4u1")
+size = Vector3(50, 1, 70)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_7x4u1"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_hdqna"]
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_ur8uo"]
+
+[sub_resource type="Gradient" id="Gradient_3dqur"]
+offsets = PackedFloat32Array(0.2, 1)
+colors = PackedColorArray(1, 1, 1, 1, 0, 0, 0, 1)
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_7h4ce"]
+noise_type = 2
+frequency = 0.03
+cellular_jitter = 3.0
+cellular_return_type = 0
+domain_warp_enabled = true
+domain_warp_type = 1
+domain_warp_amplitude = 50.0
+domain_warp_fractal_type = 2
+domain_warp_fractal_lacunarity = 1.5
+domain_warp_fractal_gain = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_4ny3m"]
+seamless = true
+color_ramp = SubResource("Gradient_3dqur")
+noise = SubResource("FastNoiseLite_7h4ce")
+
+[sub_resource type="Terrain3DMaterial" id="Terrain3DMaterial_oguhy"]
+_shader_parameters = {
+&"bias_distance": 512.0,
+&"blend_sharpness": 0.87,
+&"depth_blur": 0.0,
+&"enable_macro_variation": true,
+&"enable_projection": true,
+&"height_blending": true,
+&"macro_variation1": Color(1, 1, 1, 1),
+&"macro_variation2": Color(1, 1, 1, 1),
+&"macro_variation_slope": 0.333,
+&"mipmap_bias": 1.0,
+&"noise1_angle": 0.0,
+&"noise1_offset": Vector2(0.5, 0.5),
+&"noise1_scale": 0.04,
+&"noise2_scale": 0.076,
+&"noise3_scale": 0.225,
+&"noise_texture": SubResource("NoiseTexture2D_4ny3m"),
+&"projection_angular_division": 2.0,
+&"projection_threshold": 0.8,
+&"world_space_normal_blend": true
+}
+show_checkered = true
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ppgm3"]
+transparency = 4
+cull_mode = 2
+vertex_color_use_as_albedo = true
+backlight_enabled = true
+backlight = Color(0.5, 0.5, 0.5, 1)
+distance_fade_mode = 1
+distance_fade_min_distance = 128.0
+distance_fade_max_distance = 96.0
+
+[sub_resource type="Terrain3DMeshAsset" id="Terrain3DMeshAsset_yh42p"]
+generated_type = 1
+height_offset = 0.5
+material_override = SubResource("StandardMaterial3D_ppgm3")
+last_lod = 0
+last_shadow_lod = 0
+lod0_range = 128.0
+
+[sub_resource type="Terrain3DAssets" id="Terrain3DAssets_8yhrr"]
+mesh_list = Array[Terrain3DMeshAsset]([SubResource("Terrain3DMeshAsset_yh42p")])
+
+[node name="Map" type="Node3D"]
+
+[node name="WorldSettings" type="Node" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldSettings"]
+transform = Transform3D(0.819152, 0.419487, -0.391178, 0, 0.681998, 0.731354, 0.573576, -0.59909, 0.55866, 0, 0, 0)
+light_color = Color(0.901961, 0.901961, 0.866667, 1)
+shadow_enabled = true
+shadow_bias = 0.05
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="WorldSettings"]
+environment = SubResource("Environment_c3qe0")
+
+[node name="SpawnPoints" type="Node3D" parent="."]
+
+[node name="RedPlayerSpawnPoint" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 1, 0, -30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="RedPlayerSpawnPoint3" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -1, 0, -30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="RedPlayerSpawnPoint4" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -3, 0, -30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="RedPlayerSpawnPoint2" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 3, 0, -30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="BluePlayerSpawnPoint5" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, -1, 0, 30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="BluePlayerSpawnPoint6" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 1, 0, 30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="BluePlayerSpawnPoint7" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, 3, 0, 30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="BluePlayerSpawnPoint8" type="Node3D" parent="SpawnPoints"]
+transform = Transform3D(1, 0, -1.74846e-07, 0, 1, 0, 1.74846e-07, 0, 1, -3, 0, 30)
+script = ExtResource("2_5yi0u")
+metadata/_custom_type_script = "uid://dwqve5xxn68mx"
+
+[node name="WeaponSelectionUI" parent="." instance=ExtResource("3_heweg")]
+
+[node name="MatchInfoUI" parent="." instance=ExtResource("4_13kw8")]
+
+[node name="PreviewCamera3D" type="Camera3D" parent="."]
+transform = Transform3D(-4.36335e-08, -0.783455, 0.621449, 2.60912e-09, 0.621449, 0.783455, -1, 3.58063e-08, -2.50718e-08, 14.0803, 16.5237, 0)
+current = true
+
+[node name="Meshes" type="Node3D" parent="."]
+
+[node name="Floor" type="MeshInstance3D" parent="Meshes"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+visible = false
+mesh = SubResource("BoxMesh_ur8uo")
+
+[node name="PlayerBoundaries" type="Node3D" parent="."]
+
+[node name="WallNorth" type="StaticBody3D" parent="PlayerBoundaries"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, -32.2)
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerBoundaries/WallNorth"]
+shape = SubResource("WorldBoundaryShape3D_7x4u1")
+debug_color = Color(0.7, 0, 0, 0.42)
+
+[node name="WallSouth" type="StaticBody3D" parent="PlayerBoundaries"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 32.2)
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerBoundaries/WallSouth"]
+shape = SubResource("WorldBoundaryShape3D_hdqna")
+debug_color = Color(0.7, 0, 0, 0.42)
+
+[node name="WallEast" type="StaticBody3D" parent="PlayerBoundaries"]
+transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 22.5, 0, 0)
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerBoundaries/WallEast"]
+shape = SubResource("WorldBoundaryShape3D_hdqna")
+debug_color = Color(0.7, 0, 0, 0.42)
+
+[node name="WallWest" type="StaticBody3D" parent="PlayerBoundaries"]
+transform = Transform3D(-4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0, 1, -22.5, 0, 0)
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerBoundaries/WallWest"]
+shape = SubResource("WorldBoundaryShape3D_hdqna")
+debug_color = Color(0.7, 0, 0, 0.42)
+
+[node name="Ground" type="StaticBody3D" parent="PlayerBoundaries"]
+collision_mask = 0
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerBoundaries/Ground"]
+shape = SubResource("WorldBoundaryShape3D_ur8uo")
+
+[node name="ExactCollisions" type="Node3D" parent="."]
+
+[node name="Terrain3D" type="Terrain3D" parent="."]
+data_directory = "res://maps/terrain"
+material = SubResource("Terrain3DMaterial_oguhy")
+assets = SubResource("Terrain3DAssets_8yhrr")
+show_checkered = true
+top_level = true
+metadata/_edit_lock_ = true

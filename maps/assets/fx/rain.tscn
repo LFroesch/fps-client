@@ -1,0 +1,47 @@
+[gd_scene load_steps=7 format=3 uid="uid://cp6qm25ddouoj"]
+
+[sub_resource type="Curve" id="Curve_jgdx8"]
+_data = [Vector2(0, 0.00723469), 0.0, 4.61282, 0, 0, Vector2(0.5, 1), -0.150034, -0.150034, 0, 0, Vector2(1, 0), -4.81892, 0.0, 0, 0]
+point_count = 3
+
+[sub_resource type="CurveTexture" id="CurveTexture_mg5xy"]
+curve = SubResource("Curve_jgdx8")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_872kk"]
+particle_flag_align_y = true
+emission_shape = 3
+emission_box_extents = Vector3(50, 1, 50)
+direction = Vector3(0, -1, 0)
+spread = 10.0
+initial_velocity_min = 0.2
+initial_velocity_max = 1.0
+gravity = Vector3(0, -4, 0)
+alpha_curve = SubResource("CurveTexture_mg5xy")
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_qeadp"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2sjxk"]
+transparency = 1
+vertex_color_use_as_albedo = true
+albedo_color = Color(0.472656, 0.493256, 1, 1)
+albedo_texture = SubResource("CompressedTexture2D_qeadp")
+billboard_mode = 3
+billboard_keep_scale = true
+particles_anim_h_frames = 1
+particles_anim_v_frames = 1
+particles_anim_loop = false
+
+[sub_resource type="QuadMesh" id="QuadMesh_1crwo"]
+material = SubResource("StandardMaterial3D_2sjxk")
+size = Vector2(0.1, 0.1)
+
+[node name="Rain" type="Node3D"]
+
+[node name="RainParticles" type="GPUParticles3D" parent="."]
+amount = 2500
+lifetime = 4.0
+explosiveness = 0.3
+randomness = 0.5
+visibility_aabb = AABB(-50, -20, -50, 100, 40, 100)
+process_material = SubResource("ParticleProcessMaterial_872kk")
+draw_pass_1 = SubResource("QuadMesh_1crwo")

@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://weapon_wallbuy_001"]
+
+[ext_resource type="Script" path="res://player/buyables/weapon_wallbuy.gd" id="1_wallbuy"]
+
+[node name="WeaponWallbuy" type="Node3D"]
+script = ExtResource("1_wallbuy")
+weapon_id = 1
+weapon_cost = 1000
+ammo_cost = 500

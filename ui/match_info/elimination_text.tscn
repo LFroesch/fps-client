@@ -1,0 +1,19 @@
+[gd_scene format=3 uid="uid://c1l5cpn32bght"]
+
+[node name="EliminationText" type="RichTextLabel"]
+clip_contents = false
+offset_right = 165.0
+offset_bottom = 20.0
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 10
+theme_override_font_sizes/normal_font_size = 14
+bbcode_enabled = true
+text = "player eliminated player"
+fit_content = true
+autowrap_mode = 0
+
+[node name="QueueFreeTimer" type="Timer" parent="."]
+wait_time = 5.0
+autostart = true
+
+[connection signal="timeout" from="QueueFreeTimer" to="." method="queue_free"]

@@ -1,0 +1,49 @@
+[gd_scene load_steps=6 format=3 uid="uid://zombie_remote"]
+
+[ext_resource type="Script" path="res://player/zombie/zombie_remote.gd" id="1"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_1"]
+radius = 0.4
+height = 1.8
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_1"]
+viewport_path = NodePath("HealthBarContainer/SubViewport")
+
+[sub_resource type="SphereMesh" id="SphereMesh_headshot"]
+radius = 0.25
+height = 0.5
+
+[sub_resource type="StandardMaterial3D" id="HeadshotMaterial"]
+transparency = 1
+albedo_color = Color(1, 0, 0, 0.6)
+shading_mode = 0
+disable_receive_shadows = true
+
+[node name="ZombieRemote" type="Node3D"]
+script = ExtResource("1")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+mesh = SubResource("CapsuleMesh_1")
+
+[node name="HealthBarContainer" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.2, 0)
+
+[node name="SubViewport" type="SubViewport" parent="HealthBarContainer"]
+transparent_bg = true
+size = Vector2i(200, 20)
+
+[node name="HealthBar" type="ProgressBar" parent="HealthBarContainer/SubViewport"]
+offset_right = 200.0
+offset_bottom = 20.0
+value = 100.0
+show_percentage = false
+
+[node name="Sprite3D" type="Sprite3D" parent="HealthBarContainer"]
+billboard = 1
+texture = SubResource("ViewportTexture_1")
+
+[node name="HeadshotZone" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 0)
+mesh = SubResource("SphereMesh_headshot")
+surface_material_override/0 = SubResource("HeadshotMaterial")

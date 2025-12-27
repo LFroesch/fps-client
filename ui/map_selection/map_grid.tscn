@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=3 uid="uid://d2njy6oqmw8fp"]
+
+[ext_resource type="Script" path="res://ui/map_selection/map_grid.gd" id="1_mapgrid"]
+
+[node name="MapGrid" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_mapgrid")
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="GridContainer" type="GridContainer" parent="ScrollContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/h_separation = 16
+theme_override_constants/v_separation = 16
+columns = 3

@@ -1,0 +1,21 @@
+[gd_scene load_steps=4 format=3 uid="uid://bjkc1e8it4a80"]
+
+[ext_resource type="PackedScene" uid="uid://b000tahlm57fu" path="res://asset_packs/LowPoly-Shipping/Models/Props/ShippingContainer_Door3_R.glb" id="1_5arha"]
+[ext_resource type="PackedScene" uid="uid://euuk04hd645c" path="res://asset_packs/LowPoly-Shipping/Models/Props/ShippingContainer_Door3_L.glb" id="2_ar2b5"]
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_c12gu"]
+size = Vector3(2.30737, 2.61938, 0.0010376)
+
+[node name="Blue_Shipping_DoubleDoors" type="Node3D"]
+
+[node name="ShippingContainer_Door3_R3" parent="." instance=ExtResource("1_5arha")]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, -1.1513, 0, 0)
+
+[node name="ShippingContainer_Door3_L4" parent="." instance=ExtResource("2_ar2b5")]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 1.13481, 0, 0)
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00671387, 1.10486, 0.044342)
+shape = SubResource("BoxShape3D_c12gu")

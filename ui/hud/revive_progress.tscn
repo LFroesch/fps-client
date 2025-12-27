@@ -1,0 +1,57 @@
+[gd_scene load_steps=2 format=3 uid="uid://revive_progress"]
+
+[ext_resource type="Script" path="res://ui/hud/revive_progress.gd" id="1"]
+
+[node name="ReviveProgress" type="Control"]
+layout_mode = 3
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = 100.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("1")
+
+[node name="PromptLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_bottom = 30.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 20
+text = "Hold [F] to Revive"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PlayerNameLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 30.0
+offset_bottom = 55.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(0, 1, 0, 1)
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 18
+text = "Reviving Player"
+horizontal_alignment = 1
+
+[node name="ProgressBar" type="ProgressBar" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 60.0
+offset_bottom = 80.0
+grow_horizontal = 2
+max_value = 100.0
+show_percentage = false

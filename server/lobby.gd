@@ -28,9 +28,14 @@ func get_remote_players() -> Dictionary:
 	return remote_players
 
 func _ready() -> void:
+	print("[CLIENT LOBBY] _ready() called for lobby: %s" % name)
 	add_to_group("Lobby")
+	print("[CLIENT LOBBY] Connection status: %d" % multiplayer.multiplayer_peer.get_connection_status())
 	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
+		print("[CLIENT LOBBY] Sending c_lock_client RPC to server")
 		c_lock_client.rpc_id(1)
+	else:
+		print("[CLIENT LOBBY] NOT connected, skipping c_lock_client RPC")
 	set_physics_process(false)
 
 func _exit_tree() -> void:
