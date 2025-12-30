@@ -155,24 +155,18 @@ func add_down() -> void:
 
 # Teammate status methods
 func add_teammate(player_id: int, player_name: String) -> void:
-	print("[HUD] add_teammate called for player %d: %s" % [player_id, player_name])
 
 	if not teammate_status_container:
-		print("[HUD] ERROR: teammate_status_container is null!")
 		return
 
 	# Create card if it doesn't exist
 	if not teammate_cards.has(player_id):
-		print("[HUD] Creating new teammate card for %d" % player_id)
 		var teammate_card = TEAMMATE_STATUS_CARD_SCENE.instantiate()
 		teammate_card.setup(player_id, player_name)
 		teammate_card.set_health(100, 100)  # Initialize with full health
 		teammate_card.set_downed(false)  # Start as alive
 		teammate_status_container.add_child(teammate_card)
 		teammate_cards[player_id] = teammate_card
-		print("[HUD] Teammate card created successfully. Total cards: %d" % teammate_cards.size())
-	else:
-		print("[HUD] Card for player %d already exists" % player_id)
 
 func update_teammate_health(player_id: int, health: int, max_health: int) -> void:
 	if teammate_cards.has(player_id):

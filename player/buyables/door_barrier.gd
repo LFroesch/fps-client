@@ -39,12 +39,9 @@ func _ready() -> void:
 	add_child(interact_area)
 	interact_area.body_entered.connect(_on_body_entered)
 	interact_area.body_exited.connect(_on_body_exited)
-	print("Door barrier ready at: ", global_position)
 
 func _on_body_entered(body: Node3D) -> void:
-	print("Body entered door: ", body.name)
 	if body is PlayerLocal and not is_open:
-		print("Player detected at door!")
 		player_nearby = body
 		_update_prompt()
 

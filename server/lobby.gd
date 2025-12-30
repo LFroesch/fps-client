@@ -29,14 +29,9 @@ func get_remote_players() -> Dictionary:
 	return remote_players
 
 func _ready() -> void:
-	print("[CLIENT LOBBY] _ready() called for lobby: %s" % name)
 	add_to_group("Lobby")
-	print("[CLIENT LOBBY] Connection status: %d" % multiplayer.multiplayer_peer.get_connection_status())
 	if multiplayer.multiplayer_peer and multiplayer.multiplayer_peer.get_connection_status() == MultiplayerPeer.CONNECTION_CONNECTED:
-		print("[CLIENT LOBBY] Sending c_lock_client RPC to server")
 		c_lock_client.rpc_id(1)
-	else:
-		print("[CLIENT LOBBY] NOT connected, skipping c_lock_client RPC")
 	set_physics_process(false)
 
 func _exit_tree() -> void:
@@ -119,7 +114,9 @@ func handle_zombies(old_zombie_data : Dictionary, new_zombie_data : Dictionary, 
 			if old_zombie_data.has(zombie_id):
 				var old_pos = old_zombie_data.get(zombie_id).pos
 				var new_pos = new_zombie_data.get(zombie_id).pos
-				zombie.global_position = old_pos.lerp(new_pos, lerp_weight)
+				if zombie_id == 0 and randf() < 0.01:  # Debug first zombie occasionally
+					print("[CLIENT %s] Zombie %d: old_pos=%v new_pos=%v, current_pos=%v, global=%v" % [name, zombie_id, old_pos, new_pos, zombie.position, zombie.global_position])
+				zombie.position = old_pos.lerp(new_pos, lerp_weight)
 
 				# Interpolate rotation
 				var old_rot = old_zombie_data.get(zombie_id).rot_y
@@ -127,7 +124,7 @@ func handle_zombies(old_zombie_data : Dictionary, new_zombie_data : Dictionary, 
 				zombie.rotation.y = lerp_angle(old_rot, new_rot, lerp_weight)
 			else:
 				# Just appeared, snap to position
-				zombie.global_position = new_zombie_data.get(zombie_id).pos
+				zombie.position = new_zombie_data.get(zombie_id).pos
 				zombie.rotation.y = new_zombie_data.get(zombie_id).rot_y
 
 func handle_grenades(old_grenade_data : Dictionary, new_grenade_data : Dictionary, lerp_weight : float) -> void:
@@ -137,7 +134,7 @@ func handle_grenades(old_grenade_data : Dictionary, new_grenade_data : Dictionar
 			var grenade : Grenade = preload("res://player/grenade/grenade.tscn").instantiate()
 			grenades[grenade_name] = {"inst" : grenade, "exploded" : false}
 			grenade.name = grenade_name
-			grenade.global_transform = new_grenade_data.get(grenade_name).tform
+			grenade.transform = new_grenade_data.get(grenade_name).tform
 			add_child(grenade, true)
 
 	for grenade_name in old_grenade_data.keys():
@@ -217,9 +214,9 @@ func _remove_zombie_buyables() -> void:
 		_remove_buyables_recursive(child)
 
 func _remove_buyables_recursive(node: Node) -> void:
-	# Check if this node is a buyable
-	if node is WeaponWallbuy or node is DoorBarrier:
-		print("[Lobby] Removing zombie buyable in PVP mode: ", node.name)
+	# Check if this node is any type of buyable (all buyables are zombie-mode specific)
+	# Use duck typing to avoid class reference issues
+	if node.has_method("on_purchase_requested"):
 		node.queue_free()
 		return
 
@@ -264,11 +261,9 @@ func s_spawn_player(client_id: int, spawn_tform : Transform3D, team : int, playe
 			for other_id in player_names_and_teams.keys():
 				if other_id != multiplayer.get_unique_id():
 					var other_data = player_names_and_teams[other_id]
-					print("[Client %d] Adding teammate card for player %d: %s" % [multiplayer.get_unique_id(), other_id, other_data.display_name])
 					get_tree().call_group("HUDManager", "add_teammate", other_id, other_data.display_name)
 		# If this is ANOTHER player spawning, add their card to my HUD
 		else:
-			print("[Client %d] Adding teammate card for remote player %d: %s" % [multiplayer.get_unique_id(), client_id, player_name])
 			get_tree().call_group("HUDManager", "add_teammate", client_id, player_name)
 
 @rpc("authority", "call_remote", "unreliable_ordered")
@@ -540,7 +535,7 @@ func s_spawn_zombie(zombie_id : int, position : Vector3, zombie_type : int) -> v
 	zombie.current_health = zombie.max_health
 
 	add_child(zombie, true)
-	zombie.global_position = position  # Set position AFTER adding to tree
+	zombie.position = position  # Use local position (server sends local coords)
 	zombies[zombie_id] = zombie
 
 @rpc("authority", "call_remote", "reliable")
@@ -607,8 +602,6 @@ func s_update_zombie_health(zombie_id : int, current_health : int, max_health : 
 
 @rpc("authority", "call_remote", "reliable")
 func s_player_downed(player_id : int, damager_id : int) -> void:
-	print("Player ", player_id, " has been downed")
-
 	# Update teammate status for this player
 	get_tree().call_group("HUDManager", "update_teammate_downed", player_id, true)
 
@@ -623,8 +616,6 @@ func s_player_downed(player_id : int, damager_id : int) -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func s_player_revived(player_id : int) -> void:
-	print("Player ", player_id, " has been revived")
-
 	# Update teammate status for this player
 	get_tree().call_group("HUDManager", "update_teammate_downed", player_id, false)
 
@@ -638,8 +629,6 @@ func s_player_revived(player_id : int) -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func s_player_waiting_for_respawn(player_id : int) -> void:
-	print("Player ", player_id, " died - waiting for next round")
-
 	# Make the dead player invisible to others
 	if players.has(player_id) and is_instance_valid(players.get(player_id)):
 		var dead_player = players.get(player_id)
@@ -657,8 +646,6 @@ func s_player_waiting_for_respawn(player_id : int) -> void:
 
 @rpc("authority", "call_remote", "reliable")
 func s_player_respawned(player_id : int) -> void:
-	print("Player ", player_id, " respawned for new round")
-
 	# Make the respawned player visible again
 	if players.has(player_id) and is_instance_valid(players.get(player_id)):
 		var respawned_player = players.get(player_id)
@@ -773,42 +760,56 @@ func s_weapon_purchased(weapon_id: int, is_ammo: bool) -> void:
 		return
 
 	if is_ammo:
-		print("Ammo purchased for weapon ID: %d" % weapon_id)
 		# Replenish ammo for this specific weapon
 		if local_player.weapon_holder_node.has_weapon_in_inventory(weapon_id):
 			var weapon = local_player.weapon_holder_node.weapons_cache.get(weapon_id)
 			if weapon:
 				var weapon_data = WeaponConfig.get_weapon_data(weapon_id)
 				weapon.reserve_ammo = weapon_data.reserve_ammo
-				print("Ammo refilled for weapon ID: %d" % weapon_id)
 	else:
-		print("Weapon purchased: %d" % weapon_id)
 		# Add weapon to player's inventory
 		var result = local_player.add_weapon_to_player(weapon_id)
-		if result.replaced:
-			print("Replaced weapon ID %d with weapon ID %d" % [result.old_weapon_id, weapon_id])
 
 @rpc("authority", "call_remote", "reliable")
 func s_door_opened(door_id: String) -> void:
 	# Find the door in the map and open it
 	var door = get_node_or_null("Map/" + door_id)
+
 	if not door:
-		# Try looking for it in a Doors container
 		door = get_node_or_null("Map/Doors/" + door_id)
+
+	if not door:
+		door = get_node_or_null("Map/Buyables/" + door_id)
+
+	if not door:
+		door = _find_door_recursive(get_node_or_null("Map"), door_id)
 
 	if door and door.has_method("open_door"):
 		door.open_door()
-		print("Door opened: %s" % door_id)
+
+func _find_door_recursive(node: Node, door_id: String) -> Node:
+	if not node:
+		return null
+
+	# Check if this node matches
+	if node.name == door_id and node.has_method("open_door"):
+		return node
+
+	# Check children
+	for child in node.get_children():
+		var result = _find_door_recursive(child, door_id)
+		if result:
+			return result
+
+	return null
 
 @rpc("authority", "call_remote", "reliable")
 func s_purchase_failed(reason: String) -> void:
 	# Show error message to player
 	print("Purchase failed: %s" % reason)
-	# TODO: Show UI notification
 
 @rpc("authority", "call_remote", "reliable")
 func s_weapon_upgraded(weapon_id: int) -> void:
-	print("Weapon upgraded: %d" % weapon_id)
 	var local_player := get_local_player()
 	if not local_player:
 		return
@@ -820,27 +821,78 @@ func s_weapon_upgraded(weapon_id: int) -> void:
 
 	var weapon = weapon_holder.weapons_cache.get(weapon_id)
 	if weapon:
-		# Mark as upgraded and apply bonuses
+		# Mark as upgraded
 		weapon.is_upgraded = true
-		# TODO: Apply upgrade effects (+50% damage, +50% ammo, +33% mag size)
-		print("Weapon %d upgraded successfully!" % weapon_id)
+
+		# Apply upgrade bonuses (+50% damage, +50% reserve ammo, +33% mag size)
+		var weapon_data = WeaponConfig.get_weapon_data(weapon_id)
+
+		# Increase damage by 50%
+		weapon.damage = int(weapon_data.damage * 1.5)
+
+		# Increase magazine size by 33%
+		var new_mag_size = int(weapon_data.mag_size * 1.33)
+		weapon.mag_size = new_mag_size
+		weapon.current_ammo = new_mag_size  # Fill the larger mag
+
+		# Increase reserve ammo by 50%
+		weapon.reserve_ammo = int(weapon_data.reserve_ammo * 1.5)
 
 @rpc("authority", "call_remote", "reliable")
 func s_perk_purchased(perk_type: String) -> void:
-	print("Perk purchased: %s" % perk_type)
 	var local_player := get_local_player()
 	if not local_player:
 		return
 
-	# TODO: Apply perk effects based on perk_type
-	# This will need to be implemented per-perk
-	# For now, just track that player has it
+	# Track perks
 	if not local_player.has_meta("perks"):
 		local_player.set_meta("perks", [])
 
 	var perks = local_player.get_meta("perks")
-	if not perk_type in perks:
-		perks.append(perk_type)
-		local_player.set_meta("perks", perks)
+	if perk_type in perks:
+		return  # Already have it
 
-	print("Perk %s applied successfully!" % perk_type)
+	perks.append(perk_type)
+	local_player.set_meta("perks", perks)
+
+	# Apply perk effects (store as metadata - server handles actual stat changes)
+	match perk_type:
+		"TacticalVest":
+			# +100% max HP (server-side health management)
+			local_player.set_meta("health_multiplier", 2.0)
+
+		"FastHands":
+			# +50% reload speed
+			local_player.set_meta("reload_speed_multiplier", 1.5)
+
+		"RapidFire":
+			# +33% fire rate
+			local_player.set_meta("fire_rate_multiplier", 1.33)
+
+		"CombatMedic":
+			# +75% revive speed
+			local_player.set_meta("revive_speed_multiplier", 1.75)
+
+		"Endurance":
+			# +25% movement speed
+			if local_player.has("WALK_SPEED") and local_player.has("SPRINT_SPEED"):
+				local_player.WALK_SPEED *= 1.25
+				local_player.SPRINT_SPEED *= 1.25
+			else:
+				local_player.set_meta("movement_speed_multiplier", 1.25)
+
+		"Marksman":
+			# +10% damage to headshots
+			local_player.set_meta("headshot_damage_bonus", 0.1)
+
+		"BlastShield":
+			# Immune to explosive damage
+			local_player.set_meta("explosive_immunity", true)
+
+		"HeavyGunner":
+			# +1 weapon slot (3 total)
+			var weapon_holder = local_player.get_node_or_null("WeaponHolder")
+			if weapon_holder and weapon_holder.has("max_weapons"):
+				weapon_holder.max_weapons = 3
+			else:
+				local_player.set_meta("weapon_slots", 3)

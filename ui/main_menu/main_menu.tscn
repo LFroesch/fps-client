@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://dcjptc5h2hwgq"]
+[gd_scene load_steps=4 format=3 uid="uid://dcjptc5h2hwgq"]
 
 [ext_resource type="Script" uid="uid://dx2lbf0kkulvo" path="res://ui/main_menu/main_menu.gd" id="1_r785l"]
 [ext_resource type="Texture2D" uid="uid://byukgpq4ekqs4" path="res://asset_packs/tutorial-fps-assets/textures/bg_black_and_white.png" id="2_3848r"]
 [ext_resource type="Script" uid="uid://5xi0rw7llpta" path="res://ui/main_menu/quickplay_connection_ui.gd" id="3_omy8q"]
-[ext_resource type="PackedScene" path="res://ui/map_selection/map_grid.tscn" id="4_mapgrid"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -56,33 +55,6 @@ text = "GUN"
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="GameModeContainer" type="HBoxContainer" parent="MarginContainer2/VBoxContainer/TopBar"]
-layout_mode = 2
-theme_override_constants/separation = 12
-
-[node name="PvPButton" type="Button" parent="MarginContainer2/VBoxContainer/TopBar/GameModeContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 44)
-layout_mode = 2
-focus_mode = 0
-theme_override_font_sizes/font_size = 18
-toggle_mode = true
-button_pressed = true
-text = "PvP"
-
-[node name="ZombiesButton" type="Button" parent="MarginContainer2/VBoxContainer/TopBar/GameModeContainer"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(100, 44)
-layout_mode = 2
-focus_mode = 0
-theme_override_font_sizes/font_size = 18
-toggle_mode = true
-text = "Zombies"
-
-[node name="Spacer2" type="Control" parent="MarginContainer2/VBoxContainer/TopBar"]
-custom_minimum_size = Vector2(32, 0)
-layout_mode = 2
-
 [node name="SettingsWidget" type="VBoxContainer" parent="MarginContainer2/VBoxContainer/TopBar"]
 layout_mode = 2
 theme_override_constants/separation = 8
@@ -124,10 +96,54 @@ focus_mode = 0
 theme_override_font_sizes/font_size = 18
 text = "Exit"
 
-[node name="MapGrid" parent="MarginContainer2/VBoxContainer" instance=ExtResource("4_mapgrid")]
-unique_name_in_owner = true
+[node name="MatchmakingButtons" type="VBoxContainer" parent="MarginContainer2/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+theme_override_constants/separation = 12
+alignment = 1
+
+[node name="BrowseButton" type="Button" parent="MarginContainer2/VBoxContainer/MatchmakingButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "BROWSE LOBBIES"
+
+[node name="CreateButton" type="Button" parent="MarginContainer2/VBoxContainer/MatchmakingButtons"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(400, 60)
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_font_sizes/font_size = 24
+text = "CREATE LOBBY"
+
+[node name="Spacer" type="Control" parent="MarginContainer2/VBoxContainer/MatchmakingButtons"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+
+[node name="JoinCodeContainer" type="HBoxContainer" parent="MarginContainer2/VBoxContainer/MatchmakingButtons"]
+layout_mode = 2
+size_flags_horizontal = 4
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="MarginContainer2/VBoxContainer/MatchmakingButtons/JoinCodeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Join Code:"
+
+[node name="CodeLineEdit" type="LineEdit" parent="MarginContainer2/VBoxContainer/MatchmakingButtons/JoinCodeContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(150, 40)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+placeholder_text = "ABC123"
+max_length = 6
+
+[node name="JoinButton" type="Button" parent="MarginContainer2/VBoxContainer/MatchmakingButtons/JoinCodeContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Join"
 
 [node name="QuickplayConnectionUI" type="Control" parent="."]
 visible = false
@@ -212,11 +228,11 @@ placeholder_text = "Enter name..."
 context_menu_enabled = false
 shortcut_keys_enabled = false
 
-[connection signal="pressed" from="MarginContainer2/VBoxContainer/TopBar/GameModeContainer/PvPButton" to="." method="_on_pvp_button_pressed"]
-[connection signal="pressed" from="MarginContainer2/VBoxContainer/TopBar/GameModeContainer/ZombiesButton" to="." method="_on_zombies_button_pressed"]
 [connection signal="toggled" from="MarginContainer2/VBoxContainer/TopBar/SettingsWidget/AudioContainer/AudioCheckBox" to="." method="_on_audio_check_box_toggled"]
 [connection signal="toggled" from="MarginContainer2/VBoxContainer/TopBar/SettingsWidget/FullscreenContainer/FullscreenCheckBox" to="." method="_on_fullscreen_check_box_toggled"]
 [connection signal="pressed" from="MarginContainer2/VBoxContainer/TopBar/ExitButton" to="." method="_on_exit_button_pressed"]
-[connection signal="map_selected" from="MarginContainer2/VBoxContainer/MapGrid" to="." method="_on_map_grid_map_selected"]
+[connection signal="pressed" from="MarginContainer2/VBoxContainer/MatchmakingButtons/BrowseButton" to="." method="_on_browse_button_pressed"]
+[connection signal="pressed" from="MarginContainer2/VBoxContainer/MatchmakingButtons/CreateButton" to="." method="_on_create_button_pressed"]
+[connection signal="pressed" from="MarginContainer2/VBoxContainer/MatchmakingButtons/JoinCodeContainer/JoinButton" to="." method="_on_join_button_pressed"]
 [connection signal="pressed" from="QuickplayConnectionUI/VBoxContainer/CloseButton" to="QuickplayConnectionUI" method="_on_close_button_pressed"]
 [connection signal="pressed" from="QuickplayConnectionUI/VBoxContainer/CancelButton" to="QuickplayConnectionUI" method="_on_cancel_button_pressed"]

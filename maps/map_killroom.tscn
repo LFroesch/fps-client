@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" uid="uid://cp6qm25ddouoj" path="res://maps/assets/fx/rain.tscn" id="2_r17xs"]
 [ext_resource type="Script" uid="uid://dwqve5xxn68mx" path="res://player/spawn_point/player_spawn_point.gd" id="3_2ge8b"]
 [ext_resource type="PackedScene" uid="uid://b701rjdsnk1r1" path="res://ui/weapon_selection/weapon_selection_ui.tscn" id="4_ah5l1"]
-[ext_resource type="PackedScene" path="res://ui/zombies_countdown/zombies_countdown_ui.tscn" id="4_countdown"]
+[ext_resource type="PackedScene" uid="uid://ckg7m8vwxp2qy" path="res://ui/zombies_countdown/zombies_countdown_ui.tscn" id="4_countdown"]
 [ext_resource type="PackedScene" uid="uid://cj25o5j8n5gn0" path="res://ui/match_info/match_info_ui.tscn" id="5_ajawo"]
 [ext_resource type="Texture2D" uid="uid://dvyuyaf6p82f5" path="res://asset_packs/LowPoly-Shipping/Models/Buildings/Wall_02_Texture_FPSMap4_01.png" id="6_7o8tt"]
 [ext_resource type="Texture2D" uid="uid://obf1c0k6g0cy" path="res://asset_packs/LowPoly-Shipping/Models/Buildings/Wall_01_Texture_FPSMap4_01.png" id="7_6ejp1"]
@@ -1606,6 +1606,7 @@ environment = SubResource("Environment_c3qe0")
 
 [node name="Rain" parent="WorldSettings" instance=ExtResource("2_r17xs")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9, 0)
+visible = false
 
 [node name="SpawnPoints" type="Node3D" parent="."]
 
@@ -2927,6 +2928,7 @@ shape = SubResource("ConvexPolygonShape3D_jn48t")
 [node name="DoorBuyable" parent="Buyables" node_paths=PackedStringArray("door_mesh") instance=ExtResource("31_xa47m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 12)
 door_mesh = NodePath("Door_01")
+buyable_id = "1"
 
 [node name="Door_01" type="MeshInstance3D" parent="Buyables/DoorBuyable"]
 mesh = SubResource("ArrayMesh_ocpd4")

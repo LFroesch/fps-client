@@ -7,17 +7,17 @@ enum GameMode {
 
 const MAPS = {
 	0: {
-		"name": "Farm",
-		"client_path": "res://maps/map_farm.tscn",
-		"server_path": "res://maps/server_farm.tscn",
-		"screenshot_path": "res://asset_packs/tutorial-fps-assets/textures/bg_black_and_white.png",
-		"modes": [GameMode.PVP, GameMode.ZOMBIES]
-	},
-	1: {
 		"name": "Killroom",
 		"client_path": "res://maps/map_killroom.tscn",
 		"server_path": "res://maps/server_killroom.tscn",
 		"screenshot_path": "res://asset_packs/tutorial-fps-assets/textures/fill_bg.jpg",
+		"modes": [GameMode.PVP, GameMode.ZOMBIES]
+	},
+	1: {
+		"name": "Farm",
+		"client_path": "res://maps/map_farm.tscn",
+		"server_path": "res://maps/server_farm.tscn",
+		"screenshot_path": "res://asset_packs/tutorial-fps-assets/textures/bg_black_and_white.png",
 		"modes": [GameMode.PVP, GameMode.ZOMBIES]
 	},
 	2: {

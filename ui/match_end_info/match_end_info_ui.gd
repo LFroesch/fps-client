@@ -14,12 +14,8 @@ func _ready() -> void:
 	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
 
 func show_score_infos(client_data : Dictionary, game_mode : int = 0) -> void:
-	print("=== MATCH END INFO ===")
-	print("Game mode: ", game_mode)
-	print("Client data received:")
 	for player_id in client_data.keys():
 		var data = client_data[player_id]
-		print("  Player ", player_id, ": ", data)
 
 	# Check if this is zombie mode (game_mode 1 = zombies)
 	if game_mode == 1:

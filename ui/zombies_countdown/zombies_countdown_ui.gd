@@ -23,7 +23,6 @@ func activate(map_id: int = 1) -> void:
 
 	show()
 	set_process(true)
-	print("Zombies countdown started!")
 
 func _process(delta: float) -> void:
 	if not visible:
@@ -42,7 +41,6 @@ func _process(delta: float) -> void:
 		hide()
 
 func auto_ready() -> void:
-	print("Auto-readying with pistol (weapon_id=0)")
 	# Send pistol selection (weapon_id = 0) to server
 	get_tree().call_group("Lobby", "weapon_selected", 0)
 	if AudioManager:

@@ -1,0 +1,156 @@
+[gd_scene load_steps=2 format=3 uid="uid://d0dgq23rh5wt7"]
+
+[ext_resource type="Script" uid="uid://bu8ku03gcg5qi" path="res://ui/lobby/create_lobby_ui.gd" id="1_create"]
+
+[node name="CreateLobbyUI" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_create")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.8)
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -250.0
+offset_right = 250.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="Title" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "Create Lobby"
+horizontal_alignment = 1
+
+[node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ModeContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/ModeContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Mode:"
+
+[node name="PvPButton" type="Button" parent="CenterContainer/VBoxContainer/ModeContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+toggle_mode = true
+text = "PvP"
+
+[node name="ZombiesButton" type="Button" parent="CenterContainer/VBoxContainer/ModeContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+toggle_mode = true
+text = "Zombies"
+
+[node name="MapContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/MapContainer"]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "Map:"
+
+[node name="MapOption" type="OptionButton" parent="CenterContainer/VBoxContainer/MapContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PlayersContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/PlayersContainer"]
+layout_mode = 2
+text = "Max Players:"
+
+[node name="ButtonsContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer/PlayersContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Player1Button" type="Button" parent="CenterContainer/VBoxContainer/PlayersContainer/ButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 40)
+layout_mode = 2
+toggle_mode = true
+text = "1"
+
+[node name="Player2Button" type="Button" parent="CenterContainer/VBoxContainer/PlayersContainer/ButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 40)
+layout_mode = 2
+toggle_mode = true
+text = "2"
+
+[node name="Player3Button" type="Button" parent="CenterContainer/VBoxContainer/PlayersContainer/ButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 40)
+layout_mode = 2
+toggle_mode = true
+text = "3"
+
+[node name="Player4Button" type="Button" parent="CenterContainer/VBoxContainer/PlayersContainer/ButtonsContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(60, 40)
+layout_mode = 2
+toggle_mode = true
+text = "4"
+
+[node name="PublicContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer/VBoxContainer/PublicContainer"]
+layout_mode = 2
+text = "Public (others can join):"
+
+[node name="PublicCheckBox" type="CheckBox" parent="CenterContainer/VBoxContainer/PublicContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+button_pressed = true
+
+[node name="HSeparator2" type="HSeparator" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="ActionButtons" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="CancelButton" type="Button" parent="CenterContainer/VBoxContainer/ActionButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Cancel"
+
+[node name="CreateButton" type="Button" parent="CenterContainer/VBoxContainer/ActionButtons"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Create Lobby"

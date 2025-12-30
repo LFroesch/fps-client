@@ -14,7 +14,6 @@ func _ready() -> void:
 	cost = weapon_cost
 
 	super._ready()
-	print("Weapon wallbuy ready at: ", global_position)
 
 func setup_visuals() -> void:
 	# Create weapon display
