@@ -4,6 +4,13 @@
 
 ---
 
+- Weapon Forge / Upgraded weapon changes / bullets / etc
+- more gun options
+- test new perks
+- zombie scaling
+- roguelike buffs/drops
+- split up big files / clean up systems / etc
+
 ## Current Tasks
 
 **P0 (Critical):**
@@ -66,6 +73,27 @@ See **ZOMBIES_INTERACTABLES.md** for detailed plans:
 ---
 
 ## DevLog (Recent Changes)
+
+**Jan 4 2026:**
+- v20.2: Fixed insta-kill damage points exploit (capped to zombie max_health), pickup rotation error, zombie death race condition, pickup flash warning (replaced async loop with repeating Timer), duplicate drops (zombie_id randomization)
+- v20.1: Rebalanced zombie drop rates - Max Ammo (7%), Double Points (5%), Health (3%), Insta-Kill (1.5%), Nuke (0.5%) - total ~17% drop chance
+- v20: Power-Up System Overhaul (Phase 1) - COMPLETE
+  - Reduced zombie drop rate from 60% to ~17% (tunable via `ZOMBIE_DROP_TABLE` constant)
+  - New power-ups: Max Ammo, Insta-Kill, Double Points, Nuke, Health
+  - 30s despawn timer for uncollected power-ups with 5s flash warning
+  - Server: Insta-kill (9999 damage), Double Points (2x multiplier), Nuke (kills all, 50pts each), Max Ammo (refills all + grenades)
+  - Power-up state tracking with Timer-based expiration (30s duration for timed buffs)
+  - **Visuals:** Colored emissive boxes (Red=Insta-Kill, Gold=Double Points, Green=Nuke) with rotating animation
+  - **HUD:** Top-right power-up indicators with real-time countdown timers (updates every frame)
+  - Client: Flash warning effect, RPC handlers, full HUD implementation
+  - Files: `server/lobby.gd`, `player/pickups/pickup.gd` (both repos), `ui/hud/hud_manager.gd`
+- v19: Weapon upgrade visual effects system
+  - Created modular UpgradeVisualConfig for per-weapon, per-tier visual customization
+  - Bullet trails for upgraded weapons (cyan laser for sniper, configurable colors/sizes)
+  - Tier-based muzzle flash scaling (brightness, particle count, color tinting)
+  - Server: Fixed get_player_weapon_stats() to use tier-based multipliers (was boolean)
+  - Client: s_spawn_bullet_trail RPC spawns BulletTrail mesh with fade-out
+  - Supports progressive scaling: tier 1 = subtle glow, tier 5+ = intense beam
 
 **Jan 3 2026:**
 - v18: Health bar now shows actual HP values (100/100) instead of normalized (1/1)

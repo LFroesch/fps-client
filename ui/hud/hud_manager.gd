@@ -23,6 +23,10 @@ var teammate_cards := {}  # Dictionary to track teammate status cards
 var perks_container: VBoxContainer = null
 var active_perks := []  # Array of perk type strings
 
+# Power-up system
+var powerups_container: VBoxContainer = null
+var active_powerups := {}  # {"powerup_name": {label: Label, timer: Timer, end_time: float}}
+
 const DAMAGE_NUMBER_SCENE := preload("res://ui/hud/damage_number.tscn")
 const TEAMMATE_STATUS_CARD_SCENE := preload("res://ui/hud/teammate_status_card.tscn")
 const ZOMBIE_HUD_SCENE := preload("res://ui/hud/zombie_hud.tscn")
@@ -300,3 +304,95 @@ func _update_perks_display() -> void:
 func clear_perks() -> void:
 	active_perks.clear()
 	_update_perks_display()
+
+# Power-up system
+func _create_powerups_container() -> void:
+	if not powerups_container:
+		powerups_container = VBoxContainer.new()
+		powerups_container.name = "PowerupsContainer"
+
+		# Position in bottom left corner, above perks
+		powerups_container.anchor_left = 0.0
+		powerups_container.anchor_right = 0.0
+		powerups_container.anchor_top = 1.0
+		powerups_container.anchor_bottom = 1.0
+		powerups_container.offset_left = 10
+		powerups_container.offset_top = -310  # Above perks (-150 to -10)
+		powerups_container.offset_right = 250
+		powerups_container.offset_bottom = -160  # 10px gap above perks
+		powerups_container.grow_vertical = GROW_DIRECTION_BEGIN
+
+		add_child(powerups_container)
+
+func show_powerup_notification(powerup_name : String) -> void:
+	print("[HUD] Power-up collected: ", powerup_name)
+	# TODO: Show collection flash/sound effect
+
+func activate_powerup(powerup_name : String, duration : float) -> void:
+	if not powerups_container:
+		_create_powerups_container()
+
+	# Remove existing entry if refreshing
+	if active_powerups.has(powerup_name):
+		var entry = active_powerups[powerup_name]
+		entry.label.queue_free()
+		active_powerups.erase(powerup_name)
+
+	# Create power-up label
+	var label = Label.new()
+	var display_name = _get_powerup_display_name(powerup_name)
+	var color = _get_powerup_color(powerup_name)
+
+	label.add_theme_font_size_override("font_size", 16)
+	label.add_theme_color_override("font_color", color)
+
+	# Add to container
+	powerups_container.add_child(label)
+
+	# Store entry with end time
+	var end_time = Time.get_ticks_msec() / 1000.0 + duration
+	active_powerups[powerup_name] = {
+		"label": label,
+		"end_time": end_time,
+		"duration": duration
+	}
+
+	_update_powerup_label(powerup_name)
+
+func deactivate_powerup(powerup_name : String) -> void:
+	if active_powerups.has(powerup_name):
+		var entry = active_powerups[powerup_name]
+		entry.label.queue_free()
+		active_powerups.erase(powerup_name)
+
+func _process(delta: float) -> void:
+	# Update power-up countdown timers
+	for powerup_name in active_powerups.keys():
+		_update_powerup_label(powerup_name)
+
+func _update_powerup_label(powerup_name: String) -> void:
+	if not active_powerups.has(powerup_name):
+		return
+
+	var entry = active_powerups[powerup_name]
+	var current_time = Time.get_ticks_msec() / 1000.0
+	var time_remaining = max(0, entry.end_time - current_time)
+
+	var display_name = _get_powerup_display_name(powerup_name)
+	entry.label.text = "%s: %ds" % [display_name, ceil(time_remaining)]
+
+func _get_powerup_display_name(powerup_name: String) -> String:
+	match powerup_name:
+		"insta_kill": return "INSTA-KILL"
+		"double_points": return "DOUBLE POINTS"
+		"max_ammo": return "MAX AMMO"
+		"nuke": return "NUKE"
+		_: return powerup_name.to_upper()
+
+func _get_powerup_color(powerup_name: String) -> Color:
+	match powerup_name:
+		"insta_kill": return Color(1.0, 0.2, 0.2)  # Red
+		"double_points": return Color(1.0, 0.85, 0.0)  # Gold
+		"max_ammo": return Color(0.0, 0.8, 1.0)  # Cyan
+		"nuke": return Color(0.1, 1.0, 0.1)  # Green
+		_: return Color.WHITE

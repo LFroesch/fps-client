@@ -53,17 +53,39 @@ func reload() -> void:
 func play_shoot_fx(is_local := false, is_aiming := false) -> void:
 	shoot_light.show()
 
+	# Get upgrade tier and visual config
+	var upgrade_tier = get_meta("upgrade_tier", 0)
+	var visual_config = UpgradeVisualConfig.get_visual_config(weapon_id, upgrade_tier)
+
+	# Base values
+	var base_light_energy = 0.1
+	var base_particle_amount = 4
+	var base_particle_scale = 1.0
+
+	# Apply upgrade visuals if available
+	if not visual_config.is_empty():
+		base_light_energy = visual_config.get("muzzle_light_energy", base_light_energy)
+		base_particle_scale = visual_config.get("muzzle_particle_scale", base_particle_scale)
+
+		# Tint muzzle flash with weapon upgrade color
+		var upgrade_color = visual_config.get("muzzle_light_color", Color.WHITE)
+		shoot_light.light_color = upgrade_color
+
 	# Scale down muzzle flash when aiming down sights
 	if is_aiming:
-		shoot_light.light_energy = 0.03  # 30% of default
+		# More aggressive scaling for upgraded weapons to avoid obscuring view
+		var ads_light_mult = 0.15 if upgrade_tier > 0 else 0.3
+		var ads_scale_mult = 0.05 if upgrade_tier > 0 else 0.1
+
+		shoot_light.light_energy = base_light_energy * ads_light_mult
 		shoot_particles.amount = 1  # Minimal particles
-		shoot_particles.process_material.scale_min = 0.1
-		shoot_particles.process_material.scale_max = 0.15
+		shoot_particles.process_material.scale_min = base_particle_scale * ads_scale_mult
+		shoot_particles.process_material.scale_max = base_particle_scale * (ads_scale_mult + 0.05)
 	else:
-		shoot_light.light_energy = 0.1  # Default energy
-		shoot_particles.amount = 4  # Default particles
-		shoot_particles.process_material.scale_min = 1.0
-		shoot_particles.process_material.scale_max = 1.0
+		shoot_light.light_energy = base_light_energy
+		shoot_particles.amount = max(1, int(base_particle_amount * base_particle_scale))
+		shoot_particles.process_material.scale_min = base_particle_scale
+		shoot_particles.process_material.scale_max = base_particle_scale
 
 	shoot_particles.emitting = true
 

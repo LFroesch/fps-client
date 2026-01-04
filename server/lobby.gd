@@ -370,6 +370,22 @@ func s_spawn_bullet_hit_fx(pos: Vector3, normal : Vector3, type: int) -> void:
 	bullet_hit_fx.global_transform = spawn_tform
 	add_child(bullet_hit_fx)
 
+@rpc("authority", "call_remote", "unreliable")
+func s_spawn_bullet_trail(from_pos: Vector3, to_pos: Vector3, weapon_id: int, upgrade_tier: int) -> void:
+	if not is_inside_tree():
+		return
+
+	# Get visual config for this weapon/tier
+	var visual_config = UpgradeVisualConfig.get_visual_config(weapon_id, upgrade_tier)
+	if visual_config.is_empty() or not visual_config.get("trail_enabled", false):
+		return
+
+	# Instantiate and setup bullet trail
+	var trail_scene = preload("res://player/visual_effects/bullet_trail.tscn")
+	var trail = trail_scene.instantiate()
+	add_child(trail)
+	trail.setup(from_pos, to_pos, visual_config)
+
 @rpc("authority", "call_remote", "unreliable_ordered")
 func s_update_health(target_client_id : int, current_health : int, max_health : int, changed_amount: int, shooter_id : int = 0, is_headshot := false) -> void:
 	var maybe_player : PlayerCharacter = players.get(target_client_id)
@@ -581,10 +597,11 @@ func s_spawn_zombie(zombie_id : int, position : Vector3, zombie_type : int) -> v
 func s_zombie_died(zombie_id : int) -> void:
 	if zombies.has(zombie_id) and is_instance_valid(zombies.get(zombie_id)):
 		var zombie = zombies.get(zombie_id)
-		# Spawn death effect
+		# Spawn death effect (cache position first to avoid race condition)
 		if zombie.is_inside_tree():
+			var death_position = zombie.global_position
 			var eliminated_fx := preload("res://player/player_eliminated_effects.tscn").instantiate()
-			eliminated_fx.global_position = zombie.global_position
+			eliminated_fx.global_position = death_position
 			add_child(eliminated_fx)
 
 		zombie.queue_free()
@@ -596,6 +613,30 @@ func s_zombie_died(zombie_id : int) -> void:
 @rpc("authority", "call_remote", "reliable")
 func s_update_player_points(points : int) -> void:
 	get_tree().call_group("HUDManager", "update_points", points)
+
+@rpc("authority", "call_remote", "reliable")
+func s_powerup_collected(powerup_name : String) -> void:
+	print("Power-up collected: ", powerup_name)
+	# TODO: Play collection sound/visual effect
+	get_tree().call_group("HUDManager", "show_powerup_notification", powerup_name)
+
+@rpc("authority", "call_remote", "reliable")
+func s_powerup_activated(powerup_name : String, duration : float) -> void:
+	print("Power-up activated: ", powerup_name, " for ", duration, "s")
+	get_tree().call_group("HUDManager", "activate_powerup", powerup_name, duration)
+
+@rpc("authority", "call_remote", "reliable")
+func s_powerup_expired(powerup_name : String) -> void:
+	print("Power-up expired: ", powerup_name)
+	get_tree().call_group("HUDManager", "deactivate_powerup", powerup_name)
+
+@rpc("authority", "call_remote", "reliable")
+func s_pickup_despawn_started(pickup_name : String, despawn_time : float) -> void:
+	# Start despawn countdown on client pickup
+	if pickups.has(pickup_name):
+		var pickup = pickups[pickup_name]
+		if is_instance_valid(pickup):
+			pickup.start_despawn_countdown(despawn_time)
 
 @rpc("authority", "call_remote", "reliable")
 func s_update_teammate_scores(scores : Dictionary) -> void:
