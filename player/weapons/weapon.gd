@@ -23,12 +23,16 @@ func _on_particles_finished() -> void:
 
 func init_ammo() -> void:
 	var weapon_data := WeaponConfig.get_weapon_data(weapon_id)
-	mag_size = weapon_data.mag_size
-	reload_time = weapon_data.reload_time
+	if weapon_data.is_empty():
+		push_error("weapon.gd init_ammo: weapon_data is empty for weapon_id %d" % weapon_id)
+		return
+
+	mag_size = weapon_data["mag_size"]
+	reload_time = weapon_data["reload_time"]
 	current_ammo = mag_size
-	reserve_ammo = weapon_data.reserve_ammo
-	is_automatic = weapon_data.is_automatic
-	shot_cooldown = weapon_data.shot_cooldown
+	reserve_ammo = weapon_data["reserve_ammo"]
+	is_automatic = weapon_data["is_automatic"]
+	shot_cooldown = weapon_data["shot_cooldown"]
 
 func can_shoot() -> bool:
 	return current_ammo > 0

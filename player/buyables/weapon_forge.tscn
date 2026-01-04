@@ -1,6 +1,32 @@
-[gd_scene load_steps=2 format=3 uid="uid://b2o8jh8eg3npd"]
+[gd_scene load_steps=5 format=3 uid="uid://b2o8jh8eg3npd"]
 
 [ext_resource type="Script" uid="uid://dckjnaeebtmmh" path="res://player/buyables/weapon_forge.gd" id="1"]
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dftvb"]
+albedo_color = Color(0.3, 0.3, 0.4, 1)
+metallic = 0.8
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.3, 0.3, 0.4, 1)
+emission_energy_multiplier = 0.5
+
+[sub_resource type="BoxMesh" id="BoxMesh_bkj5l"]
+size = Vector3(1.5, 2.5, 1.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_forge"]
+albedo_color = Color(0.3, 0.3, 0.4, 1)
+metallic = 0.8
+roughness = 0.2
+emission_enabled = true
+emission = Color(0.8, 0.4, 0.1, 1)
+emission_energy_multiplier = 0.2
+
 [node name="WeaponForge" type="Node3D"]
 script = ExtResource("1")
+max_upgrade_tier = null
+
+[node name="ForgeMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.25, 0)
+material_override = SubResource("StandardMaterial3D_dftvb")
+mesh = SubResource("BoxMesh_bkj5l")
+surface_material_override/0 = SubResource("StandardMaterial3D_forge")

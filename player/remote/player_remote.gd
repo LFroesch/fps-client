@@ -84,3 +84,12 @@ func play_shoot_fx() -> void:
 
 func play_footstep_sfx() -> void:
 	AudioManager.play_sfx(AudioManager.SFXKeys.Footstep, global_position, 0.2)
+
+func change_weapon(new_weapon_id: int) -> void:
+	# Remove old weapon
+	if weapon_holder.weapon and is_instance_valid(weapon_holder.weapon):
+		weapon_holder.weapon.queue_free()
+
+	# Update weapon ID and instantiate new weapon
+	weapon_id = new_weapon_id
+	weapon_holder.instantiate_weapon(new_weapon_id)

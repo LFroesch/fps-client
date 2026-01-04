@@ -79,23 +79,102 @@ func update_lobby_list(lobbies: Array[Dictionary]) -> void:
 
 	no_lobbies_label.visible = false
 
-	# Create a button for each lobby
+	# Create a card for each lobby
 	for lobby_data in lobbies:
-		var lobby_button = Button.new()
-		lobby_button.custom_minimum_size = Vector2(600, 50)
+		create_lobby_card(lobby_data)
 
-		# Format: "MAP_NAME - HOST_NAME (2/4 players)"
-		var button_text = "%s - %s (%d/%d players)" % [
-			lobby_data.get("map_name", "Unknown"),
-			lobby_data.get("host_name", "Unknown"),
-			lobby_data.get("current_players", 0),
-			lobby_data.get("max_players", 4)
-		]
+func create_lobby_card(lobby_data: Dictionary) -> void:
+	# Create card container
+	var card = PanelContainer.new()
+	card.custom_minimum_size = Vector2(580, 55)
 
-		lobby_button.text = button_text
-		lobby_button.pressed.connect(_on_lobby_selected.bind(lobby_data.get("lobby_id", "")))
+	# Create StyleBox for card
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color(0.15, 0.18, 0.25, 1)
+	style_box.corner_radius_top_left = 10
+	style_box.corner_radius_top_right = 10
+	style_box.corner_radius_bottom_left = 10
+	style_box.corner_radius_bottom_right = 10
+	style_box.border_width_left = 2
+	style_box.border_width_right = 2
+	style_box.border_width_top = 2
+	style_box.border_width_bottom = 2
+	style_box.border_color = Color(0.3, 0.5, 0.7, 0.6)
+	card.add_theme_stylebox_override("panel", style_box)
 
-		lobby_list_container.add_child(lobby_button)
+	# Make card clickable
+	var button = Button.new()
+	button.custom_minimum_size = Vector2(580, 55)
+
+	# Transparent button style to keep card appearance
+	var btn_style = StyleBoxFlat.new()
+	btn_style.bg_color = Color(0, 0, 0, 0)
+	button.add_theme_stylebox_override("normal", btn_style)
+	button.add_theme_stylebox_override("pressed", btn_style)
+
+	var btn_hover = StyleBoxFlat.new()
+	btn_hover.bg_color = Color(0.2, 0.3, 0.4, 0.3)
+	btn_hover.corner_radius_top_left = 10
+	btn_hover.corner_radius_top_right = 10
+	btn_hover.corner_radius_bottom_left = 10
+	btn_hover.corner_radius_bottom_right = 10
+	button.add_theme_stylebox_override("hover", btn_hover)
+
+	button.pressed.connect(_on_lobby_selected.bind(lobby_data.get("lobby_id", "")))
+
+	# Create content layout
+	var margin = MarginContainer.new()
+	margin.add_theme_constant_override("margin_left", 10)
+	margin.add_theme_constant_override("margin_right", 10)
+	margin.add_theme_constant_override("margin_top", 8)
+	margin.add_theme_constant_override("margin_bottom", 8)
+	card.add_child(margin)
+
+	var vbox = VBoxContainer.new()
+	vbox.add_theme_constant_override("separation", 3)
+	margin.add_child(vbox)
+
+	# Top row: Map name + player count
+	var top_row = HBoxContainer.new()
+	vbox.add_child(top_row)
+
+	var map_label = Label.new()
+	map_label.text = lobby_data.get("map_name", "Unknown Map")
+	map_label.add_theme_font_size_override("font_size", 14)
+	map_label.add_theme_color_override("font_color", Color(0.9, 0.95, 1, 1))
+	map_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	top_row.add_child(map_label)
+
+	var player_count_label = Label.new()
+	player_count_label.text = "%d/%d" % [
+		lobby_data.get("current_players", 0),
+		lobby_data.get("max_players", 4)
+	]
+	player_count_label.add_theme_font_size_override("font_size", 14)
+
+	# Color-code based on fullness
+	var current = lobby_data.get("current_players", 0)
+	var max_p = lobby_data.get("max_players", 4)
+	if current >= max_p:
+		player_count_label.add_theme_color_override("font_color", Color(1, 0.3, 0.3, 1))  # Full = red
+	elif current >= max_p * 0.75:
+		player_count_label.add_theme_color_override("font_color", Color(1, 0.8, 0.3, 1))  # Almost full = yellow
+	else:
+		player_count_label.add_theme_color_override("font_color", Color(0.3, 1, 0.5, 1))  # Has space = green
+
+	top_row.add_child(player_count_label)
+
+	# Bottom row: Host name
+	var host_label = Label.new()
+	host_label.text = "Host: %s" % lobby_data.get("host_name", "Unknown")
+	host_label.add_theme_font_size_override("font_size", 11)
+	host_label.add_theme_color_override("font_color", Color(0.7, 0.75, 0.8, 1))
+	vbox.add_child(host_label)
+
+	# Add button overlay for clicking
+	card.add_child(button)
+
+	lobby_list_container.add_child(card)
 
 func _on_lobby_selected(lobby_id: String) -> void:
 	# Join the selected lobby

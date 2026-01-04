@@ -1,6 +1,24 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=5 format=3 uid="uid://disjkr3xvi33h"]
 
-[ext_resource type="Script" path="res://player/buyables/door_buyable.gd" id="1"]
+[ext_resource type="Script" uid="uid://8wbbj7rhplnq" path="res://player/buyables/door_buyable.gd" id="1"]
 
-[node name="DoorBuyable" type="Node3D"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_36vd8"]
+albedo_color = Color(0.6, 0.4, 0.2, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_sb0f1"]
+size = Vector3(3, 2.8, 0.2)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_door"]
+albedo_color = Color(0.6, 0.4, 0.2, 1)
+
+[node name="DoorBuyable" type="Node3D" node_paths=PackedStringArray("door_mesh")]
 script = ExtResource("1")
+door_id = null
+door_cost = null
+door_mesh = NodePath("DoorMesh")
+
+[node name="DoorMesh" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4, 0)
+material_override = SubResource("StandardMaterial3D_36vd8")
+mesh = SubResource("BoxMesh_sb0f1")
+surface_material_override/0 = SubResource("StandardMaterial3D_door")

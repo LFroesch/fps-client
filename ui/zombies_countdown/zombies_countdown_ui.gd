@@ -3,7 +3,7 @@ extends Control
 @onready var countdown_label: Label = %CountdownLabel
 @onready var map_name_label: Label = %MapNameLabel
 
-const COUNTDOWN_TIME := 3.0
+const COUNTDOWN_TIME := 0.5  # Debug: was 3.0
 var time_remaining := COUNTDOWN_TIME
 
 func _ready() -> void:

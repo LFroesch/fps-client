@@ -32,6 +32,7 @@ var is_paused := false
 var is_chat_open := false
 var is_grounded := true
 var is_sprinting := false
+var auto_run := false  # Toggle auto-run with middle mouse
 var current_anim : String
 var nearby_grenades : Array[Grenade] = []
 var coyote_timer := 0.0  # Tracks time since leaving ground
@@ -173,6 +174,11 @@ func move(delta: float):
 		return
 
 	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_backward")
+
+	# Apply auto-run forward movement
+	if auto_run:
+		input_dir.y = -1.0  # Forward direction
+
 	var direction := (transform.basis * Vector3(input_dir.x, 0, input_dir.y)).normalized()
 
 	# Update jump buffer timer
@@ -185,6 +191,7 @@ func move(delta: float):
 	var on_floor := is_on_floor()
 
 	if on_floor:
+		# Sprint if shift is held
 		is_sprinting = Input.is_action_pressed("sprint")
 		coyote_timer = coyote_time  # Reset coyote timer when on floor
 
@@ -337,9 +344,9 @@ func enter_ads() -> void:
 	if weapon_holder.weapon != null:
 		var weapon_data := WeaponConfig.get_weapon_data(weapon_holder.weapon.weapon_id)
 		if weapon_data.has("ads_offset"):
-			ads_position = weapon_data.ads_offset
+			ads_position = weapon_data["ads_offset"]
 		if weapon_data.has("ads_scale"):
-			var scale_multiplier: float = weapon_data.ads_scale
+			var scale_multiplier: float = weapon_data["ads_scale"]
 			ads_scale = default_weapon_scale * scale_multiplier
 
 	# Smoothly move weapon to ADS position and scale
@@ -373,6 +380,11 @@ func show_nearby_grenades() -> void:
 		# Check if grenade is valid and in tree before accessing global_position
 		if not is_instance_valid(grenade) or not grenade.is_inside_tree():
 			continue
+
+		# Skip display-only grenades (wallbuy displays)
+		if "is_display_only" in grenade and grenade.is_display_only:
+			continue
+
 		var grenade_pos := Vector2(grenade.global_position.x, grenade.global_position.z)
 		grenades_data[grenade.name] = own_pos.angle_to_point(grenade_pos) + PI / 2 + rotation.y
 
@@ -388,8 +400,15 @@ func replenish_ammo() -> void:
 		var weapon_instance = weapon_holder_node.weapons_cache[weapon_id]
 		var weapon_data := WeaponConfig.get_weapon_data(weapon_id)
 
-		# Fill reserve ammo
-		weapon_instance.reserve_ammo = weapon_data.reserve_ammo
+		if weapon_data.is_empty():
+			push_error("replenish_ammo: weapon_data is empty for weapon_id %d" % weapon_id)
+			continue
+
+		# Fill reserve ammo (accounting for upgrade tier)
+		var upgrade_tier = weapon_instance.get_meta("upgrade_tier", 0)
+		var reserve_multiplier = 1.0 + (upgrade_tier * 0.5)
+		weapon_instance.reserve_ammo = int(weapon_data["reserve_ammo"] * reserve_multiplier)
+
 		# Fill current magazine
 		weapon_instance.current_ammo = weapon_instance.mag_size
 
@@ -426,6 +445,13 @@ func look_around(relative:Vector2):
 	rotate_y(-relative.x * effective_sensitivity)
 	head.rotate_x(-relative.y * effective_sensitivity)
 	head.rotation.x = clampf(head.rotation.x, -PI/2, PI/2)
+
+func _unhandled_input(event: InputEvent) -> void:
+	# Toggle auto-run with middle mouse button
+	if event is InputEventMouseButton:
+		if event.button_index == MOUSE_BUTTON_MIDDLE and event.pressed:
+			auto_run = !auto_run
+			print("Auto-run: ", "ON" if auto_run else "OFF")
 
 func _unhandled_key_input(event: InputEvent) -> void:
 	if event.is_action_pressed("chat"):

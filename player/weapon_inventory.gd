@@ -1,7 +1,7 @@
 extends Node
 class_name WeaponInventory
 
-const MAX_WEAPONS = 2  # Player can hold 2 weapons max
+var max_weapons: int = 2  # Player can hold 2 weapons max (3 with HeavyGunner perk)
 
 var weapons: Array[int] = []  # Array of weapon IDs
 var current_weapon_index: int = 0
@@ -26,7 +26,7 @@ func add_weapon(weapon_id: int) -> Dictionary:
 		}
 
 	# If we have space, add it
-	if weapons.size() < MAX_WEAPONS:
+	if weapons.size() < max_weapons:
 		weapons.append(weapon_id)
 		current_weapon_index = weapons.size() - 1  # Switch to new weapon
 		weapon_added.emit(weapon_id)

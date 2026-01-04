@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cqhp8yvxn6hqa"]
+[gd_scene load_steps=3 format=3 uid="uid://cqhp8yvxn6hqa"]
 
 [ext_resource type="Script" path="res://ui/lobby/waiting_room_ui.gd" id="1_waiting_room"]
+[ext_resource type="Texture2D" uid="uid://byukgpq4ekqs4" path="res://asset_packs/tutorial-fps-assets/textures/bg_black_and_white.png" id="2_bg"]
 
 [node name="WaitingRoomUI" type="Control"]
 layout_mode = 3
@@ -11,14 +12,16 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_waiting_room")
 
-[node name="ColorRect" type="ColorRect" parent="."]
+[node name="BackgroundTextureRect" type="TextureRect" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.8)
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -27,44 +30,76 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -200.0
-offset_top = -200.0
-offset_right = 200.0
-offset_bottom = 200.0
+offset_left = -280.0
+offset_top = -220.0
+offset_right = 280.0
+offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
+theme_override_constants/outline_size = 6
+theme_override_font_sizes/font_size = 40
+text = "LOBBY"
+horizontal_alignment = 1
 
 [node name="LobbyInfoLabel" type="Label" parent="CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+theme_override_font_sizes/font_size = 18
 text = "Farm - Zombies (1/4 Players)"
 horizontal_alignment = 1
 
 [node name="LobbyCodeLabel" type="Label" parent="CenterContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Lobby Code: ABC123"
+theme_override_font_sizes/font_size = 16
+text = "Code: ABC123"
 horizontal_alignment = 1
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="PlayerList" type="VBoxContainer" parent="CenterContainer/VBoxContainer"]
+[node name="PlayersHeader" type="Label" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Players"
+horizontal_alignment = 1
+
+[node name="PlayerListScroll" type="ScrollContainer" parent="CenterContainer/VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 160)
+
+[node name="PlayerList" type="VBoxContainer" parent="CenterContainer/VBoxContainer/PlayerListScroll"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 8
 
 [node name="HSeparator2" type="HSeparator" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer"]
-unique_name_in_owner = true
+[node name="ButtonsContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
-text = "Start Game"
+theme_override_constants/separation = 12
+alignment = 1
 
-[node name="LeaveButton" type="Button" parent="CenterContainer/VBoxContainer"]
+[node name="LeaveButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Leave Lobby"
+custom_minimum_size = Vector2(140, 50)
+theme_override_font_sizes/font_size = 18
+text = "LEAVE"
+
+[node name="StartButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonsContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(180, 50)
+theme_override_font_sizes/font_size = 18
+text = "START GAME"

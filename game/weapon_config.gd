@@ -63,4 +63,8 @@ const WEAPON_DATA := {
 }
 
 static func get_weapon_data(weapon_id) -> Dictionary:
-	return WEAPON_DATA.get(weapon_id)
+	var data = WEAPON_DATA.get(weapon_id)
+	if data == null:
+		push_error("WeaponConfig: Invalid weapon_id %s" % weapon_id)
+		return {}
+	return data

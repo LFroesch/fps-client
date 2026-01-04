@@ -114,8 +114,6 @@ func handle_zombies(old_zombie_data : Dictionary, new_zombie_data : Dictionary, 
 			if old_zombie_data.has(zombie_id):
 				var old_pos = old_zombie_data.get(zombie_id).pos
 				var new_pos = new_zombie_data.get(zombie_id).pos
-				if zombie_id == 0 and randf() < 0.01:  # Debug first zombie occasionally
-					print("[CLIENT %s] Zombie %d: old_pos=%v new_pos=%v, current_pos=%v, global=%v" % [name, zombie_id, old_pos, new_pos, zombie.position, zombie.global_position])
 				zombie.position = old_pos.lerp(new_pos, lerp_weight)
 
 				# Interpolate rotation
@@ -188,6 +186,7 @@ func s_start_loading_map(received_map_id: int, received_game_mode: int = 0) -> v
 	# Hide team scores if in zombies mode
 	if game_mode == 1:
 		get_tree().call_group("MatchInfoUI", "hide_team_scores")
+		get_tree().call_group("MatchInfoUI", "move_to_bottom_right")
 
 func map_ready() -> void:
 	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
@@ -196,6 +195,8 @@ func map_ready() -> void:
 	# Remove mode-specific elements
 	if game_mode == 0:  # PVP mode - remove zombie buyables
 		_remove_zombie_buyables()
+	elif game_mode == 1:  # Zombie mode - hide pickup platforms
+		_hide_pickup_platforms()
 
 	c_map_ready.rpc_id(1)
 	
@@ -223,6 +224,24 @@ func _remove_buyables_recursive(node: Node) -> void:
 	# Recursively check children
 	for child in node.get_children():
 		_remove_buyables_recursive(child)
+
+func _hide_pickup_platforms() -> void:
+	# Find and hide all pickup platforms in zombie mode
+	var map_node = get_node_or_null("Map")
+	if not map_node:
+		return
+
+	_hide_platforms_recursive(map_node)
+
+func _hide_platforms_recursive(node: Node) -> void:
+	# Remove entire Pickup nodes in zombie mode (static map pickups)
+	if node is Pickup:
+		node.queue_free()
+		return
+
+	# Recursively check children
+	for child in node.get_children():
+		_hide_platforms_recursive(child)
 
 @rpc("authority", "call_remote", "reliable")
 func s_start_match() -> void:
@@ -266,6 +285,15 @@ func s_spawn_player(client_id: int, spawn_tform : Transform3D, team : int, playe
 		else:
 			get_tree().call_group("HUDManager", "add_teammate", client_id, player_name)
 
+@rpc("authority", "call_remote", "reliable")
+func s_player_weapon_changed(player_id: int, weapon_id: int) -> void:
+	# Update the weapon for a remote player
+	var remote_players := get_remote_players()
+	if remote_players.has(player_id):
+		var remote_player = remote_players[player_id]
+		if remote_player.has_method("change_weapon"):
+			remote_player.change_weapon(weapon_id)
+
 @rpc("authority", "call_remote", "unreliable_ordered")
 func s_send_world_state(new_world_state : Dictionary) -> void:
 	if not is_inside_tree():
@@ -284,8 +312,17 @@ func weapon_selected(weapon_id : int) -> void:
 		return
 	c_weapon_selected.rpc_id(1, weapon_id)
 
+func weapon_switched(weapon_id : int) -> void:
+	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+	c_weapon_switched.rpc_id(1, weapon_id)
+
 @rpc("any_peer", "call_remote", "reliable")
 func c_weapon_selected(weapon_id : int) -> void:
+	pass
+
+@rpc("any_peer", "call_remote", "reliable")
+func c_weapon_switched(weapon_id : int) -> void:
 	pass
 
 @rpc("any_peer", "call_remote", "reliable")
@@ -362,16 +399,18 @@ func s_spawn_pickup(pickup_name : String, pickup_type : int, pos : Vector3) -> v
 	pickup.name = pickup_name
 	pickup.position = pos
 	pickup.pickup_type = pickup_type
+
+	# In zombie mode, hide the Base (platform + ring) for drops BEFORE adding to tree
+	if game_mode == 1:
+		var base_node = pickup.get_node_or_null("Base")
+		if base_node:
+			print("[CLIENT] Hiding Base for zombie drop: %s" % pickup_name)
+			base_node.visible = false
+		else:
+			print("[CLIENT] ERROR: Base node not found in pickup: %s" % pickup_name)
+
 	add_child(pickup, true)
 	pickups[pickup.name] = pickup
-
-	# In zombie mode, hide the platform/base visuals (zombie drops only, after match starts)
-	if game_mode == 1 and match_started:
-		await pickup.ready
-		if pickup.has_node("Platform"):
-			pickup.get_node("Platform").visible = false
-		if pickup.has_node("MeshHolder"):
-			pickup.get_node("MeshHolder").visible = false
 
 @rpc("authority", "call_remote", "reliable")
 func s_pickup_cooldown_started(pickup_name : String) -> void:
@@ -744,12 +783,21 @@ func try_buy_perk(perk_type: String) -> void:
 		return
 	c_try_buy_perk.rpc_id(1, perk_type)
 
+func try_buy_grenades() -> void:
+	if not multiplayer.multiplayer_peer or multiplayer.multiplayer_peer.get_connection_status() != MultiplayerPeer.CONNECTION_CONNECTED:
+		return
+	c_try_buy_grenades.rpc_id(1)
+
 @rpc("any_peer", "call_remote", "reliable")
 func c_try_upgrade_weapon(weapon_id: int) -> void:
 	pass
 
 @rpc("any_peer", "call_remote", "reliable")
 func c_try_buy_perk(perk_type: String) -> void:
+	pass
+
+@rpc("any_peer", "call_remote", "reliable")
+func c_try_buy_grenades() -> void:
 	pass
 
 @rpc("authority", "call_remote", "reliable")
@@ -765,39 +813,37 @@ func s_weapon_purchased(weapon_id: int, is_ammo: bool) -> void:
 			var weapon = local_player.weapon_holder_node.weapons_cache.get(weapon_id)
 			if weapon:
 				var weapon_data = WeaponConfig.get_weapon_data(weapon_id)
-				weapon.reserve_ammo = weapon_data.reserve_ammo
+				if weapon_data and weapon_data.has("reserve_ammo"):
+					# Check upgrade tier and apply appropriate reserve ammo
+					var upgrade_tier = weapon.get_meta("upgrade_tier", 0)
+					var reserve_multiplier = 1.0 + (upgrade_tier * 0.5)
+					weapon.reserve_ammo = int(weapon_data["reserve_ammo"] * reserve_multiplier)
 	else:
 		# Add weapon to player's inventory
 		var result = local_player.add_weapon_to_player(weapon_id)
 
 @rpc("authority", "call_remote", "reliable")
 func s_door_opened(door_id: String) -> void:
-	# Find the door in the map and open it
-	var door = get_node_or_null("Map/" + door_id)
-
-	if not door:
-		door = get_node_or_null("Map/Doors/" + door_id)
-
-	if not door:
-		door = get_node_or_null("Map/Buyables/" + door_id)
-
-	if not door:
-		door = _find_door_recursive(get_node_or_null("Map"), door_id)
+	# Find the door in the map by its door_id property (not node name)
+	var door = _find_door_by_id(get_node_or_null("Map"), door_id)
 
 	if door and door.has_method("open_door"):
 		door.open_door()
+		# Note: open_door() already calls on_purchase_success() internally
+	else:
+		print("ERROR: Could not find door with door_id: %s" % door_id)
 
-func _find_door_recursive(node: Node, door_id: String) -> Node:
+func _find_door_by_id(node: Node, door_id: String) -> Node:
 	if not node:
 		return null
 
-	# Check if this node matches
-	if node.name == door_id and node.has_method("open_door"):
+	# Check if this node is a DoorBuyable with matching door_id property
+	if node.has_method("open_door") and "door_id" in node and node.door_id == door_id:
 		return node
 
-	# Check children
+	# Recursively check children
 	for child in node.get_children():
-		var result = _find_door_recursive(child, door_id)
+		var result = _find_door_by_id(child, door_id)
 		if result:
 			return result
 
@@ -808,35 +854,58 @@ func s_purchase_failed(reason: String) -> void:
 	# Show error message to player
 	print("Purchase failed: %s" % reason)
 
+	# Show error in match info / chat feed
+	get_tree().call_group("MatchInfoUI", "show_purchase_failed", reason)
+
 @rpc("authority", "call_remote", "reliable")
 func s_weapon_upgraded(weapon_id: int) -> void:
 	var local_player := get_local_player()
 	if not local_player:
 		return
 
-	# Apply weapon upgrade stats
-	var weapon_holder = local_player.get_node_or_null("WeaponHolder")
+	# Apply weapon upgrade stats to the SPECIFIC weapon instance only
+	var weapon_holder = local_player.weapon_holder_node
 	if not weapon_holder:
 		return
 
 	var weapon = weapon_holder.weapons_cache.get(weapon_id)
 	if weapon:
-		# Mark as upgraded
-		weapon.is_upgraded = true
+		# Get current upgrade tier and increment it
+		var current_tier = weapon.get_meta("upgrade_tier", 0)
+		var new_tier = current_tier + 1
+		weapon.set_meta("upgrade_tier", new_tier)
 
-		# Apply upgrade bonuses (+50% damage, +50% reserve ammo, +33% mag size)
+		# Apply client-side upgrade bonuses (additive per tier)
+		# Tier 1: +50% reserve/+33% mag, Tier 2: +100%/+66%, Tier 3: +150%/+99%
+		# NOTE: Damage is server-authoritative and handled in server/lobby.gd
 		var weapon_data = WeaponConfig.get_weapon_data(weapon_id)
+		if weapon_data.is_empty():
+			push_error("Cannot upgrade weapon %d - invalid weapon data" % weapon_id)
+			return
 
-		# Increase damage by 50%
-		weapon.damage = int(weapon_data.damage * 1.5)
+		# Calculate tier-based bonuses (additive scaling)
+		var mag_multiplier = 1.0 + (new_tier * 0.33)
+		var reserve_multiplier = 1.0 + (new_tier * 0.5)
 
-		# Increase magazine size by 33%
-		var new_mag_size = int(weapon_data.mag_size * 1.33)
+		# Apply magazine size bonus
+		var new_mag_size = int(weapon_data["mag_size"] * mag_multiplier)
 		weapon.mag_size = new_mag_size
 		weapon.current_ammo = new_mag_size  # Fill the larger mag
 
-		# Increase reserve ammo by 50%
-		weapon.reserve_ammo = int(weapon_data.reserve_ammo * 1.5)
+		# Apply reserve ammo bonus
+		weapon.reserve_ammo = int(weapon_data["reserve_ammo"] * reserve_multiplier)
+
+		# Notify weapon forges of successful upgrade
+		get_tree().call_group("WeaponForge", "on_purchase_success")
+
+		# Show success message with tier
+		var weapon_name = weapon_data.get("name", "Weapon") if weapon_data else "Weapon"
+		get_tree().call_group("MatchInfoUI", "show_purchase_success", "%s (Tier %d)" % [weapon_name, new_tier])
+
+@rpc("authority", "call_remote", "reliable")
+func s_grenades_purchased() -> void:
+	# Show purchase success message
+	get_tree().call_group("MatchInfoUI", "show_purchase_success", "Grenades (x5)")
 
 @rpc("authority", "call_remote", "reliable")
 func s_perk_purchased(perk_type: String) -> void:
@@ -862,12 +931,32 @@ func s_perk_purchased(perk_type: String) -> void:
 			local_player.set_meta("health_multiplier", 2.0)
 
 		"FastHands":
-			# +50% reload speed
+			# +50% reload speed (reduce reload time by ~33%)
 			local_player.set_meta("reload_speed_multiplier", 1.5)
+			var weapon_holder = local_player.weapon_holder_node
+			if weapon_holder:
+				# Apply to current weapon
+				if weapon_holder.weapon:
+					weapon_holder.weapon.reload_time /= 1.5
+				# Apply to all cached weapons
+				if "weapons_cache" in weapon_holder:
+					for weapon in weapon_holder.weapons_cache.values():
+						if is_instance_valid(weapon):
+							weapon.reload_time /= 1.5
 
 		"RapidFire":
-			# +33% fire rate
+			# +33% fire rate (reduce shot cooldown by ~25%)
 			local_player.set_meta("fire_rate_multiplier", 1.33)
+			var weapon_holder = local_player.weapon_holder_node
+			if weapon_holder:
+				# Apply to current weapon
+				if weapon_holder.weapon:
+					weapon_holder.weapon.shot_cooldown /= 1.33
+				# Apply to all cached weapons
+				if "weapons_cache" in weapon_holder:
+					for weapon in weapon_holder.weapons_cache.values():
+						if is_instance_valid(weapon):
+							weapon.shot_cooldown /= 1.33
 
 		"CombatMedic":
 			# +75% revive speed
@@ -875,15 +964,15 @@ func s_perk_purchased(perk_type: String) -> void:
 
 		"Endurance":
 			# +25% movement speed
-			if local_player.has("WALK_SPEED") and local_player.has("SPRINT_SPEED"):
-				local_player.WALK_SPEED *= 1.25
-				local_player.SPRINT_SPEED *= 1.25
+			if "normal_speed" in local_player and "sprint_speed" in local_player:
+				local_player.normal_speed *= 1.25
+				local_player.sprint_speed *= 1.25
 			else:
 				local_player.set_meta("movement_speed_multiplier", 1.25)
 
 		"Marksman":
-			# +10% damage to headshots
-			local_player.set_meta("headshot_damage_bonus", 0.1)
+			# +50% damage to headshots (server-authoritative)
+			local_player.set_meta("headshot_damage_bonus", 0.5)
 
 		"BlastShield":
 			# Immune to explosive damage
@@ -891,8 +980,25 @@ func s_perk_purchased(perk_type: String) -> void:
 
 		"HeavyGunner":
 			# +1 weapon slot (3 total)
-			var weapon_holder = local_player.get_node_or_null("WeaponHolder")
-			if weapon_holder and weapon_holder.has("max_weapons"):
-				weapon_holder.max_weapons = 3
-			else:
-				local_player.set_meta("weapon_slots", 3)
+			if local_player.weapon_inventory:
+				local_player.weapon_inventory.max_weapons = 3
+
+	# Notify perk machines of successful purchase
+	get_tree().call_group("PerkMachine", "on_purchase_success")
+
+	# Add perk to HUD display
+	get_tree().call_group("HUDManager", "add_perk", perk_type)
+
+	# Show success message with perk name
+	var perk_names = {
+		"TacticalVest": "Tactical Vest",
+		"FastHands": "Fast Hands",
+		"RapidFire": "Rapid Fire",
+		"CombatMedic": "Combat Medic",
+		"Endurance": "Endurance Training",
+		"Marksman": "Marksman",
+		"BlastShield": "Blast Shield",
+		"HeavyGunner": "Heavy Gunner"
+	}
+	var perk_name = perk_names.get(perk_type, perk_type)
+	get_tree().call_group("MatchInfoUI", "show_purchase_success", perk_name)

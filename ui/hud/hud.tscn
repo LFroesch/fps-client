@@ -1,4 +1,4 @@
-[gd_scene load_steps=12 format=3 uid="uid://qty0uvl51pci"]
+[gd_scene load_steps=13 format=3 uid="uid://qty0uvl51pci"]
 
 [ext_resource type="Script" uid="uid://c1ynegn11ouxg" path="res://ui/hud/hud_manager.gd" id="1_hudmgr"]
 [ext_resource type="Texture2D" uid="uid://bxl7ephwmm31e" path="res://asset_packs/tutorial-fps-assets/textures/health_change_mask.png" id="1_imuuq"]
@@ -10,7 +10,7 @@
 [ext_resource type="PackedScene" uid="uid://cubeh7citnpfw" path="res://ui/hud/kill_confirmation.tscn" id="6_killconf"]
 [ext_resource type="PackedScene" path="res://ui/hud/downed_overlay.tscn" id="9_downed"]
 [ext_resource type="PackedScene" path="res://ui/hud/revive_progress.tscn" id="10_revive"]
-[ext_resource type="PackedScene" uid="uid://interaction_prompt_001" path="res://ui/hud/interaction_prompt.tscn" id="11_interact"]
+[ext_resource type="PackedScene" path="res://ui/hud/interaction_prompt.tscn" id="11_interact"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_e0nub"]
 resource_local_to_scene = true
@@ -118,9 +118,9 @@ layout_mode = 1
 
 [node name="AmmoContainer" type="VBoxContainer" parent="."]
 layout_mode = 2
-offset_left = 760.0
+offset_left = 640.0
 offset_top = 390.0
-offset_right = 933.0
+offset_right = 813.0
 offset_bottom = 459.0
 size_flags_horizontal = 8
 size_flags_vertical = 8

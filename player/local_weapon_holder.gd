@@ -16,7 +16,7 @@ func _physics_process(delta: float) -> void:
 		shoot()
 	# Update HUD ammo display
 	if weapon:
-		get_tree().call_group("HUDManager", "update_ammo", weapon.current_ammo, weapon.reserve_ammo, weapon.mag_size)
+		get_tree().call_group("HUDManager", "update_ammo", weapon.current_ammo, weapon.reserve_ammo, weapon.mag_size, weapon.weapon_id)
 		
 func shoot() -> void:
 	# Check if we can shoot
@@ -42,9 +42,9 @@ func shoot() -> void:
 	if recoil_tween != null:
 		recoil_tween.kill()
 
-	var recoil_rotation = weapon_data.recoil_rotation_ads if is_aiming else weapon_data.recoil_rotation_hipfire
-	var recoil_position = weapon_data.recoil_position_ads if is_aiming else weapon_data.recoil_position_hipfire
-	var shake_amount = weapon_data.recoil_camera_shake_ads if is_aiming else weapon_data.recoil_camera_shake_hipfire
+	var recoil_rotation = weapon_data["recoil_rotation_ads"] if is_aiming else weapon_data["recoil_rotation_hipfire"]
+	var recoil_position = weapon_data["recoil_position_ads"] if is_aiming else weapon_data["recoil_position_hipfire"]
+	var shake_amount = weapon_data["recoil_camera_shake_ads"] if is_aiming else weapon_data["recoil_camera_shake_hipfire"]
 
 	weapon.rotation_degrees.x = recoil_rotation
 	weapon.position.z = recoil_position
@@ -93,9 +93,15 @@ func on_cooldown_timer_timeout() -> void:
 
 # Weapon inventory management
 func add_weapon_to_inventory(weapon_id: int) -> void:
+	# If the current weapon matches this weapon_id and isn't cached yet, cache it
+	if weapon and weapon.weapon_id == weapon_id and not weapons_cache.has(weapon_id):
+		_apply_perks_to_weapon(weapon)  # Apply perks to existing weapon
+		weapons_cache[weapon_id] = weapon
+		print("Cached existing weapon: ", weapon_id)
 	# Create and cache the weapon if not already cached
-	if not weapons_cache.has(weapon_id):
+	elif not weapons_cache.has(weapon_id):
 		var new_weapon = _create_weapon_instance(weapon_id)
+		_apply_perks_to_weapon(new_weapon)
 		weapons_cache[weapon_id] = new_weapon
 
 	# Switch to this weapon
@@ -134,12 +140,20 @@ func switch_to_weapon(weapon_id: int) -> void:
 
 	weapon.visible = true
 
+	# Notify server of weapon switch
+	get_tree().call_group("Lobby", "weapon_switched", weapon_id)
+
 	# Simple delay instead of fade (Node3D doesn't have modulate)
 	await get_tree().create_timer(0.3).timeout
 	is_switching = false
 
 func has_weapon_in_inventory(weapon_id: int) -> bool:
 	return weapons_cache.has(weapon_id)
+
+func get_current_weapon_id() -> int:
+	if weapon and is_instance_valid(weapon):
+		return weapon.weapon_id
+	return -1
 
 func _create_weapon_instance(weapon_id: int) -> Weapon:
 	var new_weapon: Weapon
@@ -150,7 +164,27 @@ func _create_weapon_instance(weapon_id: int) -> Weapon:
 		3: new_weapon = preload("res://player/weapons/weapon_sniper.tscn").instantiate()
 		4: new_weapon = preload("res://player/weapons/weapon_assault_rifle.tscn").instantiate()
 		5: new_weapon = preload("res://player/weapons/weapon_lmg.tscn").instantiate()
+		_:
+			push_error("Invalid weapon_id: %d" % weapon_id)
+			new_weapon = preload("res://player/weapons/weapon_pistol.tscn").instantiate()
 
-	new_weapon.weapon_id = weapon_id
-	new_weapon.init_ammo()
+	if new_weapon:
+		new_weapon.weapon_id = weapon_id
+		new_weapon.init_ammo()
 	return new_weapon
+
+func _apply_perks_to_weapon(weapon: Weapon) -> void:
+	# Apply active perks to newly acquired weapons
+	var player = get_parent().get_parent() as PlayerLocal
+	if not player or not player.has_meta("perks"):
+		return
+
+	var perks = player.get_meta("perks")
+
+	# Apply FastHands perk (+50% reload speed)
+	if "FastHands" in perks:
+		weapon.reload_time /= 1.5
+
+	# Apply RapidFire perk (+33% fire rate)
+	if "RapidFire" in perks:
+		weapon.shot_cooldown /= 1.33

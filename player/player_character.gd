@@ -15,7 +15,7 @@ func _ready() -> void:
 	instantiate_weapon()
 	if health_bar != null:
 		health_bar_fill_style_box = health_bar.get_theme_stylebox("fill")
-		update_health_bar(1, 1, 0)
+		update_health_bar(100, 100, 0)
 	
 func instantiate_weapon() -> void:
 	if weapon_holder == null:
@@ -26,7 +26,14 @@ func instantiate_weapon() -> void:
 func update_health_bar(current_health : int, max_health : int, changed_amount: int) -> void:
 	if health_bar == null:
 		return
-		
-	var new_value := current_health / float(max_health)
-	health_bar.value = new_value
-	health_bar_fill_style_box.bg_color = HEALTH_GRADIENT.gradient.sample(new_value)
+
+	health_bar.max_value = max_health
+	health_bar.value = current_health
+
+	var normalized_value := current_health / float(max_health)
+	health_bar_fill_style_box.bg_color = HEALTH_GRADIENT.gradient.sample(normalized_value)
+
+	# Update HP text label
+	var hp_label = health_bar.get_node_or_null("HPLabel")
+	if hp_label:
+		hp_label.text = "%d / %d" % [current_health, max_health]

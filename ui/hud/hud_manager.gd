@@ -20,6 +20,8 @@ var zombies_hud: Control = null
 var player_kills := 0
 var player_downs := 0
 var teammate_cards := {}  # Dictionary to track teammate status cards
+var perks_container: VBoxContainer = null
+var active_perks := []  # Array of perk type strings
 
 const DAMAGE_NUMBER_SCENE := preload("res://ui/hud/damage_number.tscn")
 const TEAMMATE_STATUS_CARD_SCENE := preload("res://ui/hud/teammate_status_card.tscn")
@@ -55,6 +57,9 @@ func _ready() -> void:
 	if zombies_hud:
 		zombies_hud.visible = false
 
+	# Create perks container
+	_create_perks_container()
+
 func show_hit_marker(is_headshot := false) -> void:
 	if hit_marker:
 		hit_marker.show_hit(is_headshot)
@@ -79,9 +84,18 @@ func show_kill_confirmation() -> void:
 	if kill_confirmation:
 		kill_confirmation.show_kill()
 
-func update_ammo(current: int, reserve: int, mag_size: int = 0) -> void:
+func update_ammo(current: int, reserve: int, mag_size: int = 0, weapon_id: int = -1) -> void:
 	if ammo_label:
-		ammo_label.text = "%d / %d" % [current, reserve]
+		var ammo_text = "%d / %d" % [current, reserve]
+
+		# Add weapon name if provided (only for valid weapon IDs 0-5)
+		if weapon_id >= 0 and weapon_id <= 5:
+			var weapon_data = WeaponConfig.get_weapon_data(weapon_id)
+			if not weapon_data.is_empty():
+				var weapon_name = weapon_data.get("name", "")
+				ammo_text = "%s  |  %s" % [weapon_name, ammo_text]
+
+		ammo_label.text = ammo_text
 
 	if reload_prompt and mag_size > 0:
 		# Show reload prompt when ammo is less than 1/3 of mag size and player has reserve ammo
@@ -207,3 +221,82 @@ func show_waiting_for_round() -> void:
 func hide_waiting_for_round() -> void:
 	if zombies_hud and zombies_hud.has_node("WaitingLabel"):
 		zombies_hud.get_node("WaitingLabel").visible = false
+
+# Perks system
+func _create_perks_container() -> void:
+	perks_container = VBoxContainer.new()
+	perks_container.name = "PerksContainer"
+
+	# Position in bottom left corner
+	perks_container.anchor_left = 0.0
+	perks_container.anchor_right = 0.0
+	perks_container.anchor_top = 1.0
+	perks_container.anchor_bottom = 1.0
+	perks_container.offset_left = 10
+	perks_container.offset_top = -150
+	perks_container.offset_right = 250
+	perks_container.offset_bottom = -10
+	perks_container.grow_vertical = GROW_DIRECTION_BEGIN
+
+	add_child(perks_container)
+	perks_container.visible = false  # Hidden until first perk is acquired
+
+func add_perk(perk_type: String) -> void:
+	if perk_type in active_perks:
+		return  # Already have it
+
+	active_perks.append(perk_type)
+	_update_perks_display()
+
+func _update_perks_display() -> void:
+	if not perks_container:
+		return
+
+	# Clear existing perk labels
+	for child in perks_container.get_children():
+		child.queue_free()
+
+	if active_perks.is_empty():
+		perks_container.visible = false
+		return
+
+	perks_container.visible = true
+
+	# Perk display data
+	var perk_names = {
+		"TacticalVest": "Tactical Vest",
+		"FastHands": "Fast Hands",
+		"RapidFire": "Rapid Fire",
+		"CombatMedic": "Combat Medic",
+		"Endurance": "Endurance",
+		"Marksman": "Marksman",
+		"BlastShield": "Blast Shield",
+		"HeavyGunner": "Heavy Gunner"
+	}
+
+	var perk_colors = {
+		"TacticalVest": Color(0.2, 0.6, 0.2),
+		"FastHands": Color(0.8, 0.4, 0.0),
+		"RapidFire": Color(0.9, 0.2, 0.2),
+		"CombatMedic": Color(0.3, 0.7, 0.9),
+		"Endurance": Color(0.9, 0.9, 0.2),
+		"Marksman": Color(0.5, 0.3, 0.8),
+		"BlastShield": Color(0.4, 0.4, 0.4),
+		"HeavyGunner": Color(0.6, 0.2, 0.1)
+	}
+
+	# Create label for each perk
+	for perk in active_perks:
+		var perk_label = Label.new()
+		var perk_name = perk_names.get(perk, perk)
+		var perk_color = perk_colors.get(perk, Color.WHITE)
+
+		perk_label.text = "• %s" % perk_name
+		perk_label.add_theme_color_override("font_color", perk_color)
+		perk_label.add_theme_font_size_override("font_size", 14)
+
+		perks_container.add_child(perk_label)
+
+func clear_perks() -> void:
+	active_perks.clear()
+	_update_perks_display()

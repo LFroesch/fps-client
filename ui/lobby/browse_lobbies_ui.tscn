@@ -1,6 +1,48 @@
-[gd_scene load_steps=2 format=3 uid="uid://b8qhgavxn7hqb"]
+[gd_scene load_steps=8 format=3 uid="uid://b8qhgavxn7hqb"]
 
 [ext_resource type="Script" path="res://ui/lobby/browse_lobbies_ui.gd" id="1_browse_lobbies"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_active"]
+bg_color = Color(0.3, 0.5, 0.7, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_inactive"]
+bg_color = Color(0.2, 0.22, 0.28, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_tab_hover"]
+bg_color = Color(0.25, 0.4, 0.6, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 0
+corner_radius_bottom_left = 0
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.25, 0.28, 0.35, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.35, 0.4, 0.5, 1)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_disabled"]
+bg_color = Color(0.15, 0.15, 0.18, 0.5)
+corner_radius_top_left = 8
+corner_radius_top_right = 8
+corner_radius_bottom_right = 8
+corner_radius_bottom_left = 8
 
 [node name="BrowseLobbiesUI" type="Control"]
 layout_mode = 3
@@ -18,7 +60,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.8)
+color = Color(0.08, 0.08, 0.12, 0.95)
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -27,19 +69,21 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -400.0
-offset_top = -300.0
-offset_right = 400.0
-offset_bottom = 300.0
+offset_left = -320.0
+offset_top = -220.0
+offset_right = 320.0
+offset_bottom = 220.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
 
 [node name="TitleLabel" type="Label" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
-text = "Browse Lobbies"
+theme_override_font_sizes/font_size = 22
+text = "BROWSE LOBBIES"
 horizontal_alignment = 1
 
 [node name="TabsContainer" type="HBoxContainer" parent="CenterContainer/VBoxContainer"]
@@ -49,21 +93,31 @@ alignment = 1
 [node name="PvPTabButton" type="Button" parent="CenterContainer/VBoxContainer/TabsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(150, 0)
-text = "PvP"
+custom_minimum_size = Vector2(130, 35)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_inactive")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_active")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab_active")
+text = "PVP"
 
 [node name="ZombiesTabButton" type="Button" parent="CenterContainer/VBoxContainer/TabsContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-custom_minimum_size = Vector2(150, 0)
-text = "Zombies"
+custom_minimum_size = Vector2(130, 35)
+theme_override_font_sizes/font_size = 14
+theme_override_styles/normal = SubResource("StyleBoxFlat_tab_inactive")
+theme_override_styles/hover = SubResource("StyleBoxFlat_tab_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_tab_active")
+theme_override_styles/disabled = SubResource("StyleBoxFlat_tab_active")
+text = "ZOMBIES"
 
 [node name="HSeparator" type="HSeparator" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
 
 [node name="ScrollContainer" type="ScrollContainer" parent="CenterContainer/VBoxContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(700, 400)
+custom_minimum_size = Vector2(600, 280)
 
 [node name="LobbyListContainer" type="VBoxContainer" parent="CenterContainer/VBoxContainer/ScrollContainer"]
 unique_name_in_owner = true
@@ -86,9 +140,19 @@ alignment = 1
 [node name="RefreshButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Refresh"
+custom_minimum_size = Vector2(110, 35)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_hover")
+text = "REFRESH"
 
 [node name="BackButton" type="Button" parent="CenterContainer/VBoxContainer/ButtonContainer"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Back"
+custom_minimum_size = Vector2(110, 35)
+theme_override_font_sizes/font_size = 13
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_hover")
+text = "BACK"

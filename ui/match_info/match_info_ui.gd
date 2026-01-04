@@ -52,7 +52,7 @@ func show_elimination_text(killer_id: int, victim_id: int, killer_name : String,
 func show_chat_message(sender_id: int, sender_name: String, sender_team: int, message: String, is_team_only: bool) -> void:
 	var chat_text := preload("res://ui/match_info/elimination_text.tscn").instantiate()
 	var sender_color := BLUE_TEAM_COLOR if sender_team == 0 else RED_TEAM_COLOR
-	
+
 	if is_team_only:
 		chat_text.text = "[color=#%s][TEAM] %s:[/color] %s" % [
 			sender_color,
@@ -65,5 +65,29 @@ func show_chat_message(sender_id: int, sender_name: String, sender_team: int, me
 			sender_name,
 			message
 		]
-	
+
 	elimination_texts_container.add_child(chat_text)
+
+func show_game_message(message: String, color: String = "FFFFFF") -> void:
+	var game_text := preload("res://ui/match_info/elimination_text.tscn").instantiate()
+	game_text.text = "[color=#%s]%s[/color]" % [color, message]
+	elimination_texts_container.add_child(game_text)
+
+func show_purchase_success(item_name: String) -> void:
+	show_game_message("Purchased: %s" % item_name, "00FF00")
+
+func show_purchase_failed(reason: String) -> void:
+	show_game_message(reason, "FF4444")
+
+func move_to_bottom_right() -> void:
+	# Move container to bottom right for zombie mode
+	anchor_left = 1.0
+	anchor_right = 1.0
+	anchor_top = 1.0
+	anchor_bottom = 1.0
+	offset_left = -400
+	offset_right = -20
+	offset_top = -300
+	offset_bottom = -20
+	grow_horizontal = GROW_DIRECTION_BEGIN
+	grow_vertical = GROW_DIRECTION_BEGIN
